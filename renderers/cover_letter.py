@@ -117,7 +117,7 @@ def create_cover_letter_pdf(data, output_path):
         f.write(tex_content)
 
     try:
-        run_pdflatex(tex_filename, pdf_dir, label="Cover Letter")
+        run_pdflatex(tex_filename, pdf_dir, label="Cover Letter", keep_tex=True)
         print(f"Successfully compiled Cover Letter via LaTeX: {output_path}")
     except Exception as e:
         print(f"Error compiling LaTeX: {e}", file=sys.stderr)

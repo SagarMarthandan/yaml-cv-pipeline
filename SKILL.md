@@ -11,26 +11,30 @@ End-to-end pipeline that takes a **Job Description (JD)** and produces a tailore
 ## Pipeline Overview
 
 ```
-JD + Base Resume + Project Portfolio
-        │
-        ▼
-  Step 1: ATS & JD Archival ──► ATS_Report.yaml + Job_Description.pdf
-        │
-        ▼
-  Step 2: Resume & Visual Audit ──► Resume.yaml + Layout_Audit_Report.yaml + Resume.pdf
-        │
-        ▼
-  Step 3: Cover Letter ──► Cover_Letter.yaml + Cover_Letter.pdf
+                        JD + Base Resume
+                               │
+                               ▼
+  Step 1: Setup & ATS Archival ──► ATS_Report.yaml + Job_Description.pdf
+         │
+         ├───► [Runs Zvec Offline Search on Master Portfolio (repo info.md)]
+         │     └───► Generates: project_info.md (Tailored Projects List)
+         │
+         ▼
+  Step 2: Resume & Visual Audit ──► Reads tailored project_info.md
+         │                           └───► Generates: Resume.yaml/pdf/tex
+         ▼
+  Step 3: Cover Letter ───────────► Reads tailored project_info.md
+                                     └───► Generates: Cover_Letter.yaml/pdf/tex
 ```
 
 ## Prerequisites
 
 - **Base Files Directory:**
-  - **English:** `C:\Users\sagar\Documents\YAML-CV\Base Files\English\`
-  - **German:** `C:\Users\sagar\Documents\YAML-CV\Base Files\German\`
-  - **Photo:** `C:\Users\sagar\Documents\YAML-CV\Base Files\Photo\`
-  - Files included: `resume.md` (English version), `resume_de.md` (German version), `project_info.md` (project portfolio)
-- **Python Installation:** Python 3.10+ with dependencies installed from [requirements.txt](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/requirements.txt) (`pyyaml`, `reportlab`, `pypdf` installed)
+  - **English:** `C:\Users\sagar\Documents\YAML-CV\Base Files\English\` (Base resume files)
+  - **German:** `C:\Users\sagar\Documents\YAML-CV\Base Files\German\` (Base German files)
+  - **Photo:** `C:\Users\sagar\Documents\YAML-CV\Base Files\Photo\` (Photo image files)
+  - **Repo Info:** `C:\Users\sagar\Documents\YAML-CV\Base Files\Repo Info\` (Master portfolio `repo info.md` & `zvec_portfolio` vector database index)
+- **Python Installation:** Python 3.10+ with dependencies installed from [requirements.txt](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/requirements.txt) (`pyyaml`, `reportlab`, `pypdf`, `zvec`, `sentence-transformers` installed)
 - **Working Directory:** `C:\Users\sagar\Documents\YAML-CV\Applications\`
 - **Pipeline Script Structure:**
   - `yaml_to_pdf.py` — entry point; routes YAML files to the correct renderer
@@ -82,14 +86,14 @@ Read and execute the full instructions in [02_resume_and_visual_audit.md](file:/
 **What this step does:**
 - Rewrites the resume to `Resume.yaml` using the Step 1 Improvement Blueprint and the local `project_info.md` tailored project list.
 - Compiles the initial PDF from `Resume.yaml` using the python compiler.
-- Performs post-processing on the generated LaTeX file `SAGAR_MARTHANDAN_Resume.tex` to convert all project entries from bullet-list format to compact single-paragraph format (each <= 300 characters, tools and metrics woven in).
+- Performs post-processing on the generated LaTeX file `SAGAR_MARTHANDAN_Resume.tex` (or `SAGAR_MARTHANDAN_Lebenslauf.tex` for German) to convert all project entries from bullet-list format to compact single-paragraph format (each <= 300 characters for English, <= 250 for German, tools and metrics woven in).
 - Enforces strict styling, bullet length (<= 105 characters for experience bullets), line limits (4 lines for summary), and bullet count constraints.
 - Performs a Stop-Slop audit (active voice, adverb ban, etc.) and visual eye-test audit.
 - Outputs findings to `Layout_Audit_Report.yaml` and self-corrects any formatting issues directly.
-- Runs post-rewrite ATS rescoring and updates the `post_rewrite_ats_score` block in `ATS_Report.yaml`.
-- Recompiles the final `SAGAR_MARTHANDAN_Resume.pdf` from the polished LaTeX file.
+- Runs post-rewrite ATS rescoring, updates the `post_rewrite_ats_score` block in `ATS_Report.yaml`, and rebuilds `ATS_Report.pdf`.
+- Recompiles the final `SAGAR_MARTHANDAN_Resume.pdf` (or `SAGAR_MARTHANDAN_Lebenslauf.pdf` for German) from the polished LaTeX file.
 
-**Output:** `Resume.yaml`, `Layout_Audit_Report.yaml`, and `SAGAR_MARTHANDAN_Resume.pdf` (and `Resume_v2.pdf` if needed).
+**Output:** `Resume.yaml`, `Layout_Audit_Report.yaml`, and `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` (and `Resume_v2.pdf` / `Lebenslauf_v2.pdf` if needed).
 
 ---
 
@@ -101,9 +105,9 @@ Read and execute the full instructions in [03_cover_letter.md](file:///c:/Users/
 - Generates a formal, metric-grounded cover letter adapted to the German business layout (*Geschäftsbrief*).
 - Outputs the structured content to `Cover_Letter.yaml`.
 - Respects narrative guidelines and Stop-Slop constraints.
-- Compiles the final `SAGAR_MARTHANDAN_Cover_Letter.pdf`.
+- Compiles the final `SAGAR_MARTHANDAN_Cover_Letter.pdf` (or `SAGAR_MARTHANDAN_Anschreiben.pdf` for German).
 
-**Output:** `Cover_Letter.yaml` and `SAGAR_MARTHANDAN_Cover_Letter.pdf`.
+**Output:** `Cover_Letter.yaml` and `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf`.
 
 ---
 
@@ -122,12 +126,13 @@ After all 3 steps complete, verify:
 - [ ] `ATS_Report.pdf` is generated and `post_rewrite_ats_score` block is populated
 - [ ] `Job_Description.yaml` & `Job_Description.pdf` are generated
 - [ ] `project_info.md` (tailored project list) is generated in the company folder
-- [ ] `Resume.yaml` & `SAGAR_MARTHANDAN_Resume.pdf` are generated
+- [ ] `Resume.yaml` & `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` are generated
+- [ ] `SAGAR_MARTHANDAN_Resume.tex` / `SAGAR_MARTHANDAN_Lebenslauf.tex` & `SAGAR_MARTHANDAN_Cover_Letter.tex` / `SAGAR_MARTHANDAN_Anschreiben.tex` are preserved in the folder
 - [ ] `Layout_Audit_Report.yaml` is generated with all eye-test diagnostics at Pass status
-- [ ] `Cover_Letter.yaml` & `SAGAR_MARTHANDAN_Cover_Letter.pdf` are generated
+- [ ] `Cover_Letter.yaml` & `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf` are generated
 - [ ] Professional Experience bullet points are strictly single-line and <= 105 characters
-- [ ] Project entries are in single-paragraph format, with name + `---` + description (no bullets), each <= 300 characters and fitting on <= 3 lines
-- [ ] Summary section is exactly 4 lines and <= 420 characters
-- [ ] Cover letter fits on exactly one page and has 250–320 words
+- [ ] Project entries are in single-paragraph format, with name + `---` + description (no bullets), each <= 300 characters (<= 250 characters for German) and fitting on <= 3 lines
+- [ ] Summary section is exactly 4 lines and <= 420 characters (<= 380 characters for German Zusammenfassung)
+- [ ] Cover letter fits on exactly one page and has 250–320 words (180–240 words for German Anschreiben)
 - [ ] All files match the target JD language and comply with the Stop-Slop guidelines
 

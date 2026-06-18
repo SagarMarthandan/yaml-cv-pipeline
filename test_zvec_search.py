@@ -26,10 +26,17 @@ def main():
     )
     try:
         results = search_relevant_projects(jd_de, top_k=3)
+        titles = [r['title'].lower() for r in results]
+        
+        # Verify that Data Engineering related projects are in the top-3
+        assert any("f1 ingestion" in t or "data engineering" in t or "elt platform" in t for t in titles), \
+            f"DE query assertion failed. Got titles: {titles}"
+            
         for idx, match in enumerate(results):
             print(f"{idx+1}. {match['title']} (Score: {match['score']:.4f})")
     except Exception as e:
-        print(f"Search failed: {e}", file=sys.stderr)
+        print(f"Search failed or assertion failed: {e}", file=sys.stderr)
+        sys.exit(1)
         
     print("\n=== Step 3: Testing Search for 'AI / RAG Developer' ===")
     jd_ai = (
@@ -38,10 +45,17 @@ def main():
     )
     try:
         results = search_relevant_projects(jd_ai, top_k=3)
+        titles = [r['title'].lower() for r in results]
+        
+        # Verify that AI or RAG related projects are in the top-3
+        assert any("retrieval-augmented" in t or "rag" in t or "ats resume" in t for t in titles), \
+            f"AI query assertion failed. Got titles: {titles}"
+            
         for idx, match in enumerate(results):
             print(f"{idx+1}. {match['title']} (Score: {match['score']:.4f})")
     except Exception as e:
-        print(f"Search failed: {e}", file=sys.stderr)
+        print(f"Search failed or assertion failed: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

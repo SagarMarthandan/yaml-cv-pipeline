@@ -52,11 +52,22 @@ def parse_repo_markdown(file_path: str) -> list[dict]:
     projects = []
     
     # Standard headers we want to filter out that are instructions/notes rather than project titles
-    ignored_keywords = {
-        "create", "install", "on", "replace", "running", 
-        "troubleshooting", "prerequisites", "packages", 
-        "transform", "run", "using", "assert"
-    }
+    ignored_prefixes = (
+        "create environment",
+        "install requirements",
+        "on windows",
+        "on macos",
+        "replace google colab",
+        "install packages",
+        "transform and compile",
+        "run data quality",
+        "using uv",
+        "1. initialize airflow",
+        "2. launch the",
+        "open and run experiments",
+        "prerequisites",
+        "troubleshooting"
+    )
     
     for line in lines:
         stripped = line.strip()
@@ -71,8 +82,8 @@ def parse_repo_markdown(file_path: str) -> list[dict]:
             cleaned_title = re.sub(r'[^\w\s\(\)\+\-\.:]', '', header_text).strip()
             
             # Verify it's not a generic setup/config step header
-            first_word = cleaned_title.split()[0].lower() if cleaned_title else ""
-            if first_word in ignored_keywords:
+            title_lower = cleaned_title.lower()
+            if any(title_lower.startswith(prefix) for prefix in ignored_prefixes):
                 if current_project_title is not None:
                     current_project_lines.append(line)
                 continue

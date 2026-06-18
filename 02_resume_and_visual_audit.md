@@ -20,15 +20,24 @@ Generate a tailored, high-scannability resume (`Resume.yaml`) directly in struct
   3. Projects (Projekte)
   4. Professional Experience (Berufserfahrung)
   5. Education (Ausbildung)
-  6. Spoken Languages (Sprachen)### 2. Structural & Layout Constraints
+  6. Spoken Languages (Sprachen)
+
+### 2. Structural & Layout Constraints
 To pass the visual audit and recruiter "eye test," the resume MUST fit within a clean 1.5-page layout:
-- **Summary:** Exactly 4 lines of text, maximum 420 characters (`<= 420`), utilizing the limit fully. Do not list tools here.
+- **Output Filename Language Rules:**
+  - **English JDs:** Resume PDF ➔ `SAGAR_MARTHANDAN_Resume.pdf` (LaTeX source ➔ `SAGAR_MARTHANDAN_Resume.tex`).
+  - **German JDs:** Resume PDF ➔ `SAGAR_MARTHANDAN_Lebenslauf.pdf` (LaTeX source ➔ `SAGAR_MARTHANDAN_Lebenslauf.tex`).
+- **Summary:** Must occupy **exactly 4 lines** of text.
+  - **English Resumes:** Max 420 characters (`<= 420`).
+  - **German Resumes (Zusammenfassung):** Max **`340–380` characters** to prevent overflow to a 5th line due to longer German words.
 - **Project Section:**
   - Select the best 3 projects first that resonate with the job description.
   - Add a fourth project if it increases the ATS score for the job description.
   - Combined project name and tools must be `<= 120` characters to prevent title line wrapping in YAML.
   - **Single-Paragraph Format (LaTeX Polish):** Convert all projects to single-paragraph format during the LaTeX post-processing polish (see Section 4).
-  - Each project paragraph (including name) must be `<= 300` characters and occupy `<= 3` lines max on the compiled PDF.
+  - Each project paragraph (including name) must occupy **`<= 3` lines max** on the compiled PDF.
+    - **English Resumes:** Max 300 characters (`<= 300`).
+    - **German Resumes (Projekte):** Max **`230–250` characters** to keep within the 3-line limit.
 - **Professional Experience:** Exactly 4 bullets for **IBM India**, exactly 2 bullets for **Staff 4 cruise** (werkstudent).
 - **Strict Single-Line Experience Bullets:**
   - Every single bullet in experience must be strictly `<= 105` characters and occupy exactly one line on the compiled PDF (no wrapping/overflow to a second line). **105 characters is the canonical limit — apply it to all experience bullets.**
@@ -60,7 +69,7 @@ Immediately after compiling the initial PDF from YAML (which outputs the `.tex` 
    \noindent\textbf{[Project Name]} --- [Action verb] [what was built] [quantified metric] [tools woven in]. [Second/third sentences with detail/tools/outcomes/CI/CD].\vspace{6pt}
    ```
 4. **Quantification:** Every project must contain at least one quantified metric (number, percentage, volume, or time unit).
-5. **Length Limits:** Each project entry (including the name, `---`, and description) must be `<= 300` characters total and fit within exactly 3 lines max on the compiled PDF.
+5. **Length Limits:** Each project entry (including the name, `---`, and description) must be `<= 300` characters total (`<= 250` characters for German projects) and fit within exactly 3 lines max on the compiled PDF.
 6. **Keyword Preservation:** All tools, technologies, and domain terms from the original YAML bullets must appear in the paragraph prose to preserve the ATS score. Do not drop keywords.
 7. **Active voice:** Start sentences with active action verbs. Do not use adverbs ending in `-ly` or punctuation em-dashes (except for the `---` separator after the project name).
 
@@ -86,6 +95,7 @@ Immediately after compiling the initial PDF from YAML (which outputs the `.tex` 
 - Re-run the 5-category ATS matrix on the optimized resume. Make sure to run it against the final polished LaTeX resume (since that represents the final output).
 - Calculate `score_delta` (post_score - pre_score).
 - Update the `post_rewrite_ats_score` block in the existing `ATS_Report.yaml` file (do not overwrite the pre-rewrite section) with the final optimized score.
+- Recompile `ATS_Report.pdf` from the updated `ATS_Report.yaml` file using `yaml_to_pdf.py`.
 - Surface the score delta comparison to the user in the console output.
 
 ## Output Target & Directory Structure
@@ -154,30 +164,45 @@ languages:
 Compile the initial resume PDF from YAML (this generates the `.tex` file in the company folder):
 ```powershell
 cd "C:\Users\sagar\Documents\YAML-CV\Applications\[Company Name] — [Job Role]\"
+
+# For English JDs:
 python "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "Resume.yaml" "SAGAR_MARTHANDAN_Resume.pdf"
+
+# For German JDs:
+python "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "Resume.yaml" "SAGAR_MARTHANDAN_Lebenslauf.pdf"
 ```
 
 ### Step B: Apply LaTeX Polish & Character Count Checks
-Edit the generated `SAGAR_MARTHANDAN_Resume.tex` directly to convert all projects to the single-paragraph format. Then, run the character count checking script to verify the <= 300 character constraint:
+Edit the generated LaTeX file (`SAGAR_MARTHANDAN_Resume.tex` or `SAGAR_MARTHANDAN_Lebenslauf.tex`) directly to convert all projects to the single-paragraph format. Then, run the character count checking script to verify the character constraint (<= 300 characters for English, <= 250 characters for German):
 ```powershell
 python -c "
-import re
-with open('SAGAR_MARTHANDAN_Resume.tex', 'r', encoding='utf-8') as f:
+import os, re
+tex_file = 'SAGAR_MARTHANDAN_Lebenslauf.tex' if os.path.exists('SAGAR_MARTHANDAN_Lebenslauf.tex') else 'SAGAR_MARTHANDAN_Resume.tex'
+limit = 250 if 'Lebenslauf' in tex_file else 300
+with open(tex_file, 'r', encoding='utf-8') as f:
     content = f.read()
 projects = re.findall(r'\\noindent\\textbf\{(.+?)\} --- (.+?)\\vspace', content, re.DOTALL)
 for name, desc in projects:
     full = name + ' --- ' + desc
-    status = 'OK' if len(full) <= 300 else 'FAIL'
-    print(f'{status} | {name}: {len(full)} chars')
+    status = 'OK' if len(full) <= limit else 'FAIL'
+    print(f'{status} | {name}: {len(full)} chars (limit: {limit})')
 "
 ```
-If any project exceeds 300 characters, trim the prose in `SAGAR_MARTHANDAN_Resume.tex` directly.
+If any project exceeds the limit, trim the prose in the `.tex` file directly.
 
-### Step C: Final Recompilation
-Compile the updated `.tex` file twice to resolve references and produce the final PDF:
+### Step C: Final Recompilation & ATS Report Refresh
+Compile the updated `.tex` file twice to resolve references and produce the final PDF, and compile the updated `ATS_Report.yaml` to generate the final refreshed PDF report with post-rewrite scores:
 ```powershell
+# For English JDs:
 pdflatex -interaction=nonstopmode "SAGAR_MARTHANDAN_Resume.tex"
 pdflatex -interaction=nonstopmode "SAGAR_MARTHANDAN_Resume.tex"
+
+# For German JDs:
+pdflatex -interaction=nonstopmode "SAGAR_MARTHANDAN_Lebenslauf.tex"
+pdflatex -interaction=nonstopmode "SAGAR_MARTHANDAN_Lebenslauf.tex"
+
+# Compile the updated ATS Report with post-rewrite scores
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "ATS_Report.yaml" "ATS_Report.pdf"
 ```
 
 ---

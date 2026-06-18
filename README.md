@@ -41,8 +41,8 @@ graph TD
     OutJD[Job_Description.yaml<br>Job_Description.pdf]:::output
     OutATS[ATS_Report.yaml<br>ATS_Report.pdf]:::output
     OutProj[project_info.md<br>Tailored Project List]:::output
-    OutRes[Resume.yaml<br>SAGAR_MARTHANDAN_Resume.pdf]:::output
-    OutCL[Cover_Letter.yaml<br>SAGAR_MARTHANDAN_Cover_Letter.pdf]:::output
+    OutRes[Resume.yaml<br>SAGAR_MARTHANDAN_Resume.pdf<br>or SAGAR_MARTHANDAN_Lebenslauf.pdf]:::output
+    OutCL[Cover_Letter.yaml<br>SAGAR_MARTHANDAN_Cover_Letter.pdf<br>or SAGAR_MARTHANDAN_Anschreiben.pdf]:::output
 
     %% Flow Connections
     JD --> Deps
@@ -81,19 +81,19 @@ The entire process is organized into 3 primary sequential steps, executed automa
 
 ### STEP 2: Resume Rewrite & Visual Layout Audit
 - **Tuned Resume Generation:** Writes `Resume.yaml` by tailoring descriptions, skills, and summary to align with the target role archetype and the retrieved local projects.
-- **LaTeX Compilation & Project Format Polish:** Generates a professional LaTeX resume (`SAGAR_MARTHANDAN_Resume.tex`) and converts project listings from standard bullet points into a compact, single-paragraph prose block with tools woven in naturally.
+- **LaTeX Compilation & Project Format Polish:** Generates a professional LaTeX resume (`SAGAR_MARTHANDAN_Resume.tex` or `SAGAR_MARTHANDAN_Lebenslauf.tex` for German) and converts project listings from standard bullet points into a compact, single-paragraph prose block with tools woven in naturally.
 - **Constraints & Eye-Test Audit:** Runs character-length audits:
   - Experience bullets: Must be strictly single-line and `<= 105` characters.
-  - Project paragraphs: Must be `<= 300` characters total and fit within `<= 3` lines.
-  - Summary: Exactly 4 lines of text, maximum 420 characters.
+  - Project paragraphs: Must be `<= 300` characters total (<= 250 characters for German projects) and fit within `<= 3` lines.
+  - Summary: Exactly 4 lines of text, maximum 420 characters (maximum 380 characters for German Zusammenfassung).
   - Stop-Slop writing rules: Strict active voice, no `-ly` adverbs, zero em-dashes, no filler text.
 - **Self-Correction:** Resolves any line-wraps or overflows dynamically.
-- **Outputs:** `Resume.yaml`, `SAGAR_MARTHANDAN_Resume.pdf`, `Layout_Audit_Report.yaml`, and the post-rewrite ATS rescoring results updated inside `ATS_Report.yaml`.
+- **Outputs:** `Resume.yaml`, `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` (along with preserved LaTeX `.tex` sources), `Layout_Audit_Report.yaml`, and the post-rewrite ATS rescoring results updated inside `ATS_Report.yaml`.
 
 ### STEP 3: Cover Letter Generation
 - **Geschäftsbrief Layout:** Generates a metric-grounded cover letter adapted to formal German business formatting.
-- **Strict Limits:** Restricts cover letter content to exactly one page, 4 paragraphs, and **250–320 words** total.
-- **Outputs:** `Cover_Letter.yaml` and compiled `SAGAR_MARTHANDAN_Cover_Letter.pdf`.
+- **Strict Limits:** Restricts cover letter content to exactly one page, 4 paragraphs, and **250–320 words** total (restricted to **180–240 words** for German cover letters).
+- **Outputs:** `Cover_Letter.yaml` and compiled `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf` (along with preserved LaTeX `.tex` sources).
 
 ---
 
@@ -110,13 +110,12 @@ To eliminate all cloud-based API key requirements, embedding costs, and data lea
 
 ```
 C:\Users\sagar\Documents\YAML-CV\
-├── repo info.md              # Master list of all projects and repositories
 ├── Base Files\
 │   ├── English\              # English base resume.md and project_info.md
 │   ├── German\               # German base resume_de.md
 │   ├── Photo\                # Sagar.jpg for LaTeX header template
 │   └── Repo Info\
-│       ├── repo info.md      # Duplicate master portfolio reference
+│       ├── repo info.md      # Master portfolio markdown file (indexed in Zvec)
 │       └── zvec_portfolio\   # Local offline Zvec vector database folder
 ├── skills\
 │   └── yaml-cv-pipeline\
@@ -134,9 +133,9 @@ C:\Users\sagar\Documents\YAML-CV\
         ├── Job_Description.yaml / .pdf
         ├── ATS_Report.yaml / .pdf
         ├── project_info.md          # Tailored project list
-        ├── Resume.yaml / .pdf / .tex
-        ├── Layout_Audit_Report.yaml
-        └── Cover_Letter.yaml / .pdf
+        ├── Resume.yaml / Layout_Audit_Report.yaml / Cover_Letter.yaml
+        ├── SAGAR_MARTHANDAN_Resume.pdf / .tex (or SAGAR_MARTHANDAN_Lebenslauf.pdf / .tex)
+        └── SAGAR_MARTHANDAN_Cover_Letter.pdf / .tex (or SAGAR_MARTHANDAN_Anschreiben.pdf / .tex)
 ```
 
 ---

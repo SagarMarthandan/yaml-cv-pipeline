@@ -18,7 +18,8 @@ Generate a formal, high-impact cover letter in YAML (`Cover_Letter.yaml`) ground
   - **Date (Right-Aligned):** City, date (e.g. Kiel, 30. Mai 2026).
   - **Subject Line:** Bold, single line (e.g., "Bewerbung als [Title]").
   - **Opening Salutation:** Formal addressing of team/manager.
-  - **Body Prose:** Max 4 paragraphs, 250–320 words total (must fit on a single A4 page).
+  - **Body Prose (English Cover Letter):** Max 4 paragraphs, 250–320 words total (must fit on a single A4 page).
+  - **Body Prose (German Anschreiben):** Max 4 paragraphs, 180–240 words total (each paragraph must be reduced by 10–20 words to avoid overflow on A4 page).
   - **Closing Sign-Off:** Formal sign-off followed by full signature name.
 
 ### 2. Narrative Rules & Stop-Slop Checks
@@ -61,8 +62,11 @@ Compile the cover letter immediately:
 ```powershell
 cd "C:\Users\sagar\Documents\YAML-CV\Applications\[Company Name] — [Job Role]\"
 
-# Compile Cover Letter
+# Compile Cover Letter (English JD)
 python "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Cover_Letter.pdf"
+
+# Compile Cover Letter (German JD)
+python "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Anschreiben.pdf"
 ```
 
 ---
