@@ -159,6 +159,14 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v9 — ReportLab Only for ATS Analysis (ReportFallback Mode)
+**Files:** `renderers/ats_report.py`, `SKILL.md`
+
+- Changed the ATS Analysis report compiler to output directly in ReportLab fallback mode (no LaTeX conversion or pdflatex compiling).
+- Streamlined `create_ats_report_pdf` to call the fallback generator `_create_ats_report_pdf_reportlab` directly.
+
+---
+
 ### v8 — LaTeX Paragraph Separation Fix
 **Files:** `renderers/resume.py`, `02_resume_and_visual_audit.md`
 
