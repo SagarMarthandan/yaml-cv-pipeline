@@ -159,6 +159,26 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v7 — Zvec API Deprecation Fix & Warning Suppression
+**Files:** `zvec_portfolio_search.py`
+
+- Replaced deprecated `zvec.VectorQuery("embedding", vector=...)` with the current `zvec.Query(field_name="embedding", vector=...)` API — eliminates the `DeprecationWarning` on every run.
+- Added `os.environ.setdefault("HF_HUB_DISABLE_IMPLICIT_TOKEN", "1")` and `TOKENIZERS_PARALLELISM=false` at module load time to suppress the harmless HuggingFace Hub unauthenticated-request warning (model is already cached locally, no network calls are made).
+
+---
+
+### v6 — README Changelog & Mermaid Diagram Fix
+**Files:** `README.md`
+
+- Added full `## Changelog` section to `README.md` documenting all changes from v1–v5 with files affected, rationale, and bullet-point summaries.
+- Fixed Mermaid architectural diagram for GitHub compatibility:
+  - Replaced `&` with `and` in all node labels and subgraph titles (GitHub's Mermaid parser treats `&` as a syntax token).
+  - Split multi-source arrow syntax (`A & B --> C`) into individual arrows — not supported in GitHub's Mermaid version.
+  - Replaced `<br>` multi-line node labels with single-line labels using em-dashes.
+  - Quoted all subgraph titles to prevent parse errors on special characters.
+
+---
+
 ### v5 — RAG Output Distillation
 **Files:** `zvec_portfolio_search.py`
 

@@ -12,6 +12,11 @@ import shutil
 import zvec
 from sentence_transformers import SentenceTransformer
 
+# Suppress the HuggingFace Hub unauthenticated-request warning.
+# The model (all-MiniLM-L6-v2) is already cached locally; no network calls are made.
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+os.environ.setdefault("HF_HUB_DISABLE_IMPLICIT_TOKEN", "1")
+
 # Default configurations
 DEFAULT_MD_PATH = r"C:\Users\sagar\Documents\YAML-CV\Base Files\Repo Info\repo info.md"
 DEFAULT_DB_PATH = r"C:\Users\sagar\Documents\YAML-CV\Base Files\Repo Info\zvec_portfolio"
@@ -178,7 +183,7 @@ def search_relevant_projects(job_description: str, top_k: int = 4, db_path: str 
     
     print(f"Searching Zvec collection for top {top_k} matches...")
     results = collection.query(
-        zvec.VectorQuery("embedding", vector=jd_embedding),
+        zvec.Query(field_name="embedding", vector=jd_embedding),
         topk=top_k
     )
     
