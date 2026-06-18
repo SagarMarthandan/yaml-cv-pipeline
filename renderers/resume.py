@@ -198,7 +198,7 @@ def create_resume_pdf(data, output_path):
         
         item_tex = (
             f"\\resumeProject{{{proj_name}}} \\projectTools{{Tools: {tools_str}}}\n"
-            f"\\vspace{{1pt}}\n"
+            f"\\vspace{{2pt}}\n"
             f"\\begin{{itemize}}[leftmargin=*,nosep,itemsep=1pt]\n{bullets_tex}\n\\end{{itemize}}"
         )
         if i == 0:
@@ -209,7 +209,7 @@ def create_resume_pdf(data, output_path):
             )
         else:
             proj_tex_items.append(item_tex)
-    projects_tex = "\n\\vspace{8pt}\n".join(proj_tex_items) if proj_tex_items else ""
+    projects_tex = "\n\\vspace{6pt}\n".join(proj_tex_items) if proj_tex_items else ""
 
     # E. Professional Experience
     exp_tex_items = []
@@ -222,9 +222,10 @@ def create_resume_pdf(data, output_path):
         bullets_tex = "\n".join([f"  \\resumeItem{{{b}}}" for b in bullets])
         
         item_tex = (
-            f"\\jobEntry{{{company}}}{{{date}}} \\\\[2pt]\n"
+            f"\\jobEntry{{{company}}}{{{date}}}\\\\*\n"
+            f"\\vspace{{2pt}}\n"
             f"\\jobTitle{{{title}}}\n"
-            f"\\vspace{{1pt}}\n"
+            f"\\vspace{{2pt}}\n"
             f"\\begin{{itemize}}[leftmargin=*,nosep,itemsep=1pt]\n{bullets_tex}\n\\end{{itemize}}"
         )
         if i == 0:
@@ -235,7 +236,7 @@ def create_resume_pdf(data, output_path):
             )
         else:
             exp_tex_items.append(item_tex)
-    experience_tex = "\n\\vspace{8pt}\n".join(exp_tex_items) if exp_tex_items else ""
+    experience_tex = "\n\\vspace{6pt}\n".join(exp_tex_items) if exp_tex_items else ""
 
     # F. Spoken Languages
     lang_items = data.get('languages', data.get('spoken_languages', data.get('sprachen', [])))
