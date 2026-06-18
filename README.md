@@ -18,50 +18,52 @@ graph TD
 
     %% Elements
     JD[Raw Job Description]:::input
-    BaseFiles[Base Files:<br>resume.md / resume_de.md<br>English & German]:::input
-    RepoInfo[Master Portfolio:<br>repo info.md]:::input
+    BaseFiles["Base Files: resume.md / resume_de.md"]:::input
+    RepoInfo["Master Portfolio: repo info.md"]:::input
 
-    subgraph Step1 [Step 1: ATS Analysis & JD Archival]
+    subgraph Step1 ["Step 1: ATS Analysis and JD Archival"]
         Deps[pip install -r requirements.txt]:::system
-        ATS[ATS Score Gate<br>5-Category scoring matrix]:::processing
-        Zvec[Zvec Local Search<br>all-MiniLM-L6-v2 Embeddings]:::processing
+        ATS["ATS Score Gate — 5-Category scoring matrix"]:::processing
+        Zvec["Zvec Local Search — all-MiniLM-L6-v2"]:::processing
     end
 
-    subgraph Step2 [Step 2: Resume Rewrite & Visual Audit]
-        Rewrite[Resume.yaml Generation<br>Role Archetype Tuning]:::processing
-        LaTeX[LaTeX Polish<br>Single-paragraph project format]:::processing
-        Audit[Visual Layout Audit<br>Layout_Audit_Report.yaml]:::processing
+    subgraph Step2 ["Step 2: Resume Rewrite and Visual Audit"]
+        Rewrite["Resume.yaml Generation — Role Archetype Tuning"]:::processing
+        LaTeX["LaTeX Polish — Single-paragraph project format"]:::processing
+        Audit["Visual Layout Audit — Layout_Audit_Report.yaml"]:::processing
     end
 
-    subgraph Step3 [Step 3: Cover Letter Generation]
-        CL[Geschäftsbrief Generation<br>Cover_Letter.yaml]:::processing
+    subgraph Step3 ["Step 3: Cover Letter Generation"]
+        CL["Geschaeftsbr. Generation — Cover_Letter.yaml"]:::processing
     end
 
     %% Pipeline Outputs
-    OutJD[Job_Description.yaml<br>Job_Description.pdf]:::output
-    OutATS[ATS_Report.yaml<br>ATS_Report.pdf]:::output
-    OutProj[project_info.md<br>Tailored Project List]:::output
-    OutRes[Resume.yaml<br>SAGAR_MARTHANDAN_Resume.pdf<br>or SAGAR_MARTHANDAN_Lebenslauf.pdf]:::output
-    OutCL[Cover_Letter.yaml<br>SAGAR_MARTHANDAN_Cover_Letter.pdf<br>or SAGAR_MARTHANDAN_Anschreiben.pdf]:::output
+    OutJD["Job_Description.yaml / .pdf"]:::output
+    OutATS["ATS_Report.yaml / .pdf"]:::output
+    OutProj["project_info.md — Tailored Project List"]:::output
+    OutRes["Resume.yaml / SAGAR_MARTHANDAN_Resume.pdf"]:::output
+    OutCL["Cover_Letter.yaml / SAGAR_MARTHANDAN_Cover_Letter.pdf"]:::output
 
     %% Flow Connections
     JD --> Deps
     Deps --> ATS
     BaseFiles --> ATS
-    
+
     RepoInfo --> Zvec
     JD --> Zvec
-    
+
     ATS --> OutATS
     ATS --> OutJD
     Zvec --> OutProj
-    
-    OutProj & OutATS --> Rewrite
+
+    OutProj --> Rewrite
+    OutATS --> Rewrite
     Rewrite --> LaTeX
     LaTeX --> Audit
     Audit --> OutRes
-    
-    OutProj & OutRes --> CL
+
+    OutProj --> CL
+    OutRes --> CL
     CL --> OutCL
 ```
 
