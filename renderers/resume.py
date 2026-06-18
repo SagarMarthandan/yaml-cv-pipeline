@@ -199,7 +199,7 @@ def create_resume_pdf(data, output_path):
         item_tex = (
             f"\\resumeProject{{{proj_name}}} \\projectTools{{Tools: {tools_str}}}\n"
             f"\\vspace{{2pt}}\n"
-            f"\\begin{{itemize}}[leftmargin=*,nosep,itemsep=1pt]\n{bullets_tex}\n\\end{{itemize}}"
+            f"\\begin{{itemize}}[leftmargin=*,nosep,itemsep=1pt]\n{bullets_tex}\n\\end{{itemize}}\\par"
         )
         if i == 0:
             proj_tex_items.append(
@@ -226,7 +226,7 @@ def create_resume_pdf(data, output_path):
             f"\\vspace{{2pt}}\n"
             f"\\jobTitle{{{title}}}\n"
             f"\\vspace{{2pt}}\n"
-            f"\\begin{{itemize}}[leftmargin=*,nosep,itemsep=1pt]\n{bullets_tex}\n\\end{{itemize}}"
+            f"\\begin{{itemize}}[leftmargin=*,nosep,itemsep=1pt]\n{bullets_tex}\n\\end{{itemize}}\\par"
         )
         if i == 0:
             exp_tex_items.append(

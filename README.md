@@ -159,6 +159,16 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v8 — LaTeX Paragraph Separation Fix
+**Files:** `renderers/resume.py`, `02_resume_and_visual_audit.md`
+
+- Fixed projects (and experience entries) flowing together as one continuous block of text with no visual gap between them.
+- **Root cause:** `\vspace{6pt}` between `\noindent` paragraphs was firing in LaTeX's horizontal mode (mid-paragraph) where it is a no-op. LaTeX must be in vertical mode for `\vspace` to produce actual vertical space.
+- **Fix:** Added `\par` at the end of each `\end{itemize}` block in the generator (`resume.py`). `\par` explicitly ends the paragraph and switches LaTeX to vertical mode before the `\vspace{6pt}` separator fires.
+- Updated `02_resume_and_visual_audit.md` Step 4 format rule to require `.\par` at the end of every project paragraph in the LaTeX polish step, with a Critical callout explaining the horizontal/vertical mode mechanic.
+
+---
+
 ### v7 — Zvec API Deprecation Fix & Warning Suppression
 **Files:** `zvec_portfolio_search.py`
 
