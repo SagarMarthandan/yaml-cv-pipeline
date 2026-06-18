@@ -194,6 +194,68 @@ def search_relevant_projects(job_description: str, top_k: int = 4, db_path: str 
     return matched_projects
 
 
+def distill_project(proj: dict) -> str:
+    """
+    Strips a project's raw markdown to just the signal Step 2 needs:
+      - Title (the # heading)
+      - First non-empty prose paragraph (project description / overview)
+      - First line that looks like a tech-stack / tools list
+
+    Skips: code fences, badge lines, bullet lists, sub-headers, empty lines,
+           and noise sections (Prerequisites, Troubleshooting, etc.).
+    """
+    lines = proj['content'].splitlines()
+    title_line = f"# {proj['title']}"
+    description = ""
+    tech_line = ""
+
+    in_code_block = False
+    found_title = False
+    prose_done = False
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Track code fences — skip everything inside
+        if stripped.startswith('```'):
+            in_code_block = not in_code_block
+            continue
+        if in_code_block:
+            continue
+
+        # Skip badge/image lines (shields.io etc.)
+        if stripped.startswith('[![') or stripped.startswith('!['):
+            continue
+
+        # Skip all markdown headers (we already have the title from proj['title'])
+        if stripped.startswith('#'):
+            found_title = True
+            continue
+
+        # Mark prose as done once we step past the first paragraph
+        if description and not prose_done and not stripped:
+            prose_done = True
+
+        # Capture the first non-empty prose paragraph after the title header
+        if found_title and not description and stripped and not stripped.startswith('-') and not stripped.startswith('|'):
+            description = stripped
+            continue
+
+        # Capture the first tech-stack line (e.g. "Tech: ..." or "Tools: ...")
+        if prose_done and not tech_line:
+            low = stripped.lower()
+            if any(low.startswith(kw) for kw in ('tech', 'stack', 'tools', '**tech', '**stack', '**tools')):
+                tech_line = stripped
+                break  # We have everything we need
+
+    parts = [title_line]
+    if description:
+        parts.append(description)
+    if tech_line:
+        parts.append(tech_line)
+    return "\n".join(parts)
+
+
 if __name__ == '__main__':
     import sys
     import yaml
@@ -245,10 +307,10 @@ if __name__ == '__main__':
         # Query matching projects
         matched = search_relevant_projects(jd_text, top_k=4)
         
-        # Format matched projects into markdown portfolio format
+        # Format matched projects into concise summaries (title + description + tools only)
         portfolio_md = "# Tailored Project Portfolio\n\n"
         for proj in matched:
-            portfolio_md += f"{proj['content']}\n\n---\n\n"
+            portfolio_md += f"{distill_project(proj)}\n\n---\n\n"
             
         # Write outputs
         out_dir = os.path.dirname(os.path.abspath(out_path))
