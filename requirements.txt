@@ -1,0 +1,5 @@
+pyyaml
+reportlab
+pypdf
+zvec
+sentence-transformers
