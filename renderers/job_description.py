@@ -1,5 +1,5 @@
 """
-Job description renderer — LaTeX primary, ReportLab fallback.
+Job description renderer — ReportLab only (reportfallback mode).
 Handles documents with type: job_description
 """
 import os
@@ -19,78 +19,10 @@ from .utils import TEXT_DARK, LINE_COLOR, escape_latex, run_pdflatex
 # ── LaTeX renderer ────────────────────────────────────────────────────────────
 
 def create_job_description_pdf(data, output_path):
-    print(f"Attempting to compile Job Description via LaTeX: {output_path}")
+    """Compile Job_Description.yaml to a clean PDF via ReportLab directly (ReportLab fallback mode)."""
+    print(f"Compiling Job Description via ReportLab fallback mode (no LaTeX): {output_path}")
+    _create_job_description_pdf_reportlab(data, output_path)
 
-    company  = escape_latex(data.get('company',  'Company'))
-    position = escape_latex(data.get('position', 'Position'))
-
-    sections = data.get('sections', [])
-    sections_tex_parts = []
-    for sec in sections:
-        title   = escape_latex(str(sec.get('title', '')))
-        content = sec.get('content', '')
-        bullets = sec.get('bullets', [])
-
-        sec_tex = f"\\section{{{title}}}\n"
-
-        if content:
-            if isinstance(content, list):
-                sec_tex += "\n\n".join([escape_latex(str(p)) for p in content])
-            else:
-                sec_tex += escape_latex(str(content))
-            sec_tex += "\n"
-
-        if bullets:
-            bullet_lines = "\n".join([f"  \\item {escape_latex(str(b))}" for b in bullets])
-            sec_tex += f"\\begin{{itemize}}[noitemsep,leftmargin=*]\n{bullet_lines}\n\\end{{itemize}}\n"
-
-        sections_tex_parts.append(sec_tex)
-
-    body_tex = "\n".join(sections_tex_parts)
-
-    tex_content = f"""\\documentclass[11pt,a4paper]{{article}}
-\\usepackage[utf8]{{inputenc}}
-\\usepackage[margin=0.8in]{{geometry}}
-\\usepackage{{enumitem}}
-\\usepackage{{titlesec}}
-\\usepackage[T1]{{fontenc}}
-\\usepackage{{lmodern}}
-\\usepackage{{hyperref}}
-\\usepackage{{parskip}}
-
-\\pagestyle{{empty}}
-\\setlength{{\\parindent}}{{0pt}}
-
-\\titleformat{{\\section}}{{\\normalsize\\bfseries}}{{}}{{0em}}{{}}[\\titlerule]
-\\titlespacing{{\\section}}{{0pt}}{{12pt}}{{5pt}}
-
-\\hypersetup{{colorlinks=true,urlcolor=black,linkcolor=black}}
-
-\\begin{{document}}
-
-{{\\Large\\bfseries {company} \\textemdash{{}} {position}}}
-
-\\vspace{{8pt}}
-
-{body_tex}
-
-\\end{{document}}
-"""
-
-    pdf_dir      = os.path.dirname(os.path.abspath(output_path))
-    base_name    = os.path.splitext(os.path.basename(output_path))[0]
-    tex_filename = f"{base_name}.tex"
-
-    with open(os.path.join(pdf_dir, tex_filename), 'w', encoding='utf-8') as f:
-        f.write(tex_content)
-
-    try:
-        run_pdflatex(tex_filename, pdf_dir, label="Job Description")
-        print(f"Successfully compiled Job Description via LaTeX: {output_path}")
-    except Exception as e:
-        print(f"Error compiling LaTeX: {e}", file=sys.stderr)
-        print("Falling back to ReportLab compilation...", file=sys.stderr)
-        _create_job_description_pdf_reportlab(data, output_path)
 
 
 # ── ReportLab fallback ────────────────────────────────────────────────────────

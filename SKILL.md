@@ -41,7 +41,7 @@ End-to-end pipeline that takes a **Job Description (JD)** and produces a tailore
   - `renderers/utils.py` — shared utilities (`escape_latex`, color constants, `run_pdflatex`)
   - `renderers/resume.py` — Resume renderer (LaTeX primary, ReportLab fallback)
   - `renderers/cover_letter.py` — Cover Letter renderer (LaTeX primary, ReportLab fallback)
-  - `renderers/job_description.py` — Job Description renderer (LaTeX primary, ReportLab fallback)
+  - `renderers/job_description.py` — Job Description renderer (ReportLab only)
   - `renderers/ats_report.py` — ATS Report renderer (ReportLab only)
 
 ## General Writing & Style Rules (Stop-Slop)

@@ -159,6 +159,14 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v10 — ReportLab Only for Job Description Archival
+**Files:** `renderers/job_description.py`, `SKILL.md`
+
+- Changed the Job Description compiler to output directly in ReportLab fallback mode (no LaTeX conversion or pdflatex compiling).
+- Streamlined `create_job_description_pdf` to call the fallback generator `_create_job_description_pdf_reportlab` directly.
+
+---
+
 ### v9 — ReportLab Only for ATS Analysis (ReportFallback Mode)
 **Files:** `renderers/ats_report.py`, `SKILL.md`
 
