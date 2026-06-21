@@ -111,3 +111,76 @@ def run_pdflatex(tex_filename, pdf_dir, label="document", keep_tex=False):
                     os.remove(tmp)
                 except Exception as e:
                     print(f"Warning: Could not remove {tmp}: {e}", file=sys.stderr)
+
+
+_GOOGLE_SANS_CODE_REGISTERED = None
+
+def register_google_sans_code():
+    """
+    Registers Google Sans Code TTF fonts with ReportLab.
+    Looks in LOCALAPPDATA/Microsoft/Windows/Fonts and C:/Windows/Fonts.
+    Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) representing the registered font names,
+    or falls back to ('Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique', 'Helvetica-BoldOblique') if not found.
+    """
+    global _GOOGLE_SANS_CODE_REGISTERED
+    if _GOOGLE_SANS_CODE_REGISTERED is not None:
+        return _GOOGLE_SANS_CODE_REGISTERED
+
+    try:
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+
+        dirs = [
+            os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "Windows", "Fonts"),
+            r"C:\Windows\Fonts"
+        ]
+        
+        regular_file = "GoogleSansCode-Regular.ttf"
+        bold_file = "GoogleSansCode-Bold.ttf"
+        italic_file = "GoogleSansCode-Italic.ttf"
+        bold_italic_file = "GoogleSansCode-BoldItalic.ttf"
+
+        regular_path = None
+        bold_path = None
+        italic_path = None
+        bold_italic_path = None
+
+        for d in dirs:
+            if not d or not os.path.exists(d):
+                continue
+            r_p = os.path.join(d, regular_file)
+            b_p = os.path.join(d, bold_file)
+            i_p = os.path.join(d, italic_file)
+            bi_p = os.path.join(d, bold_italic_file)
+            
+            if os.path.exists(r_p) and os.path.exists(b_p):
+                regular_path = r_p
+                bold_path = b_p
+                if os.path.exists(i_p):
+                    italic_path = i_p
+                if os.path.exists(bi_p):
+                    bold_italic_path = bi_p
+                break
+
+        if not regular_path or not bold_path:
+            _GOOGLE_SANS_CODE_REGISTERED = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
+            return _GOOGLE_SANS_CODE_REGISTERED
+
+        pdfmetrics.registerFont(TTFont("GoogleSansCode", regular_path))
+        pdfmetrics.registerFont(TTFont("GoogleSansCode-Bold", bold_path))
+        pdfmetrics.registerFont(TTFont("GoogleSansCode-Italic", italic_path if italic_path else regular_path))
+        pdfmetrics.registerFont(TTFont("GoogleSansCode-BoldItalic", bold_italic_path if bold_italic_path else bold_path))
+        
+        pdfmetrics.registerFontFamily(
+            "GoogleSansCode",
+            normal="GoogleSansCode",
+            bold="GoogleSansCode-Bold",
+            italic="GoogleSansCode-Italic",
+            boldItalic="GoogleSansCode-BoldItalic",
+        )
+        _GOOGLE_SANS_CODE_REGISTERED = ("GoogleSansCode", "GoogleSansCode-Bold", "GoogleSansCode-Italic", "GoogleSansCode-BoldItalic")
+        return _GOOGLE_SANS_CODE_REGISTERED
+    except Exception as e:
+        print(f"Warning: Could not register Google Sans Code: {e}", file=sys.stderr)
+        _GOOGLE_SANS_CODE_REGISTERED = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
+        return _GOOGLE_SANS_CODE_REGISTERED

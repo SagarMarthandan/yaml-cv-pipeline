@@ -115,8 +115,12 @@ def parse_repo_markdown(file_path: str) -> list[dict]:
     return projects
 
 
-def ingest_portfolio(markdown_path: str = DEFAULT_MD_PATH, db_path: str = DEFAULT_DB_PATH, force_recreate: bool = True):
+def ingest_portfolio(markdown_path: str = DEFAULT_MD_PATH, db_path: str = DEFAULT_DB_PATH, force_recreate: bool = False):
     """Chunks, embeds, and saves projects to Zvec."""
+    if os.path.exists(db_path) and not force_recreate:
+        print(f"Database already exists at: {db_path}. Skipping ingestion (force_recreate=False).")
+        return
+
     print(f"Reading markdown file: {markdown_path}")
     projects = parse_repo_markdown(markdown_path)
     print(f"Found {len(projects)} projects/repositories to index.")

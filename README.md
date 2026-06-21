@@ -1,3 +1,4 @@
+[//]: # (DEVELOPER DOCUMENTATION ONLY — not part of agent runtime context. Do not read this file during pipeline execution.)
 # 📄 Premium YAML-CV Resume & Cover Letter Tailoring Pipeline
 
 An end-to-end, high-scannability, and ATS-optimized application materials generation pipeline. It uses structured YAML files for configuration, compiles them to PDF/LaTeX, and leverages a local **Zvec vector database** to dynamically rank and inject relevant engineering projects from a master portfolio based on a target Job Description (JD).
@@ -158,6 +159,17 @@ To execute the pipeline:
 ---
 
 ## 📋 Changelog
+
+### v12 — Pipeline Token Optimizations & Google Sans Code Font
+**Files:** `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `SKILL.md`, `README.md`, `zvec_portfolio_search.py`, `renderers/utils.py`, `renderers/ats_report.py`, `renderers/job_description.py`
+
+- Collapsed writing style guidelines and step descriptions to reference-only summaries, saving context tokens and preventing documentation drift.
+- Replaced copy-paste attachment placeholders with direct file load instructions, saving **1,000–3,000+ context tokens** per run.
+- Changed default behavior of `ingest_portfolio()` to not overwrite existing databases by default (`force_recreate=False`), and to skip ingestion if the database already exists.
+- Added developer-only skip comment to the top of `README.md`.
+- Implemented and registered `Google Sans Code` font family as the rendering typeface for ATS Reports and Job Description PDFs.
+
+---
 
 ### v11 — YAML Frontmatter Syntax Fix
 **Files:** `SKILL.md`

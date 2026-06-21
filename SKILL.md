@@ -66,15 +66,7 @@ The user must provide:
 
 Read and execute the full instructions in [01_ats_and_jd_archival.md](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/01_ats_and_jd_archival.md).
 
-- Automatically runs the dependency installation command using the `requirements.txt` file.
-- Detects Job Description (JD) language (English or German).
-- Classifies the role archetype and sets `role_archetype` in the report.
-- Scores the base resume against the 5-category ATS matrix (0–100).
-- Applies the **ATS Score Gate** (if score < 85, stop and warn).
-- Cleans and formats the raw JD into `Job_Description.yaml`.
-- Saves ATS metrics to `ATS_Report.yaml` in the company directory.
-- Runs the local offline Zvec search tool on the job description to find the top 4 matching projects from your global portfolio, writing them to a tailored `project_info.md` file in the company folder.
-- Compiles `ATS_Report.pdf` and `Job_Description.pdf`.
+Runs dependency check, parses and archives the job description, scores the base resume, and generates a tailored project list using the Zvec tool.
 
 **Output:** `ATS_Report.yaml`, `ATS_Report.pdf`, `Job_Description.yaml`, `Job_Description.pdf`, and `project_info.md` in `[Company Name] — [Job Role]/` folder.
 
@@ -84,15 +76,7 @@ Read and execute the full instructions in [01_ats_and_jd_archival.md](file:///c:
 
 Read and execute the full instructions in [02_resume_and_visual_audit.md](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/02_resume_and_visual_audit.md).
 
-**What this step does:**
-- Rewrites the resume to `Resume.yaml` using the Step 1 Improvement Blueprint and the local `project_info.md` tailored project list.
-- Compiles the initial PDF from `Resume.yaml` using the python compiler.
-- Performs post-processing on the generated LaTeX file `SAGAR_MARTHANDAN_Resume.tex` (or `SAGAR_MARTHANDAN_Lebenslauf.tex` for German) to convert all project entries from bullet-list format to compact single-paragraph format (each <= 300 characters for English, <= 250 for German, tools and metrics woven in).
-- Enforces strict styling, bullet length (<= 105 characters for experience bullets), line limits (4 lines for summary), and bullet count constraints.
-- Performs a Stop-Slop audit (active voice, adverb ban, etc.) and visual eye-test audit.
-- Outputs findings to `Layout_Audit_Report.yaml` and self-corrects any formatting issues directly.
-- Runs post-rewrite ATS rescoring, updates the `post_rewrite_ats_score` block in `ATS_Report.yaml`, and rebuilds `ATS_Report.pdf`.
-- Recompiles the final `SAGAR_MARTHANDAN_Resume.pdf` (or `SAGAR_MARTHANDAN_Lebenslauf.pdf` for German) from the polished LaTeX file.
+Rewrites the resume based on the ATS Improvement Blueprint and the tailored project list. Compiles the resume via LaTeX, performs a visual layout audit and Stop-Slop check, and updates the post-rewrite ATS score.
 
 **Output:** `Resume.yaml`, `Layout_Audit_Report.yaml`, and `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` (and `Resume_v2.pdf` / `Lebenslauf_v2.pdf` if needed).
 
@@ -102,11 +86,7 @@ Read and execute the full instructions in [02_resume_and_visual_audit.md](file:/
 
 Read and execute the full instructions in [03_cover_letter.md](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/03_cover_letter.md).
 
-**What this step does:**
-- Generates a formal, metric-grounded cover letter adapted to the German business layout (*Geschäftsbrief*).
-- Outputs the structured content to `Cover_Letter.yaml`.
-- Respects narrative guidelines and Stop-Slop constraints.
-- Compiles the final `SAGAR_MARTHANDAN_Cover_Letter.pdf` (or `SAGAR_MARTHANDAN_Anschreiben.pdf` for German).
+Generates a formal, metric-grounded cover letter standard conforming to German Geschäftsbrief layout in the target JD language.
 
 **Output:** `Cover_Letter.yaml` and `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf`.
 

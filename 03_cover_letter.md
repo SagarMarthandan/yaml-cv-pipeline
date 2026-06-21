@@ -24,7 +24,7 @@ Generate a formal, high-impact cover letter in YAML (`Cover_Letter.yaml`) ground
 
 ### 2. Narrative Rules & Stop-Slop Checks
 - Ground every tech skill in metrics from the portfolio or Step 1 report. Do not use AI fluff words or clichés ("passionate", "thrilled").
-- Apply **Stop-Slop** rules (strict active voice, absolute adverb ban, zero em-dashes, cut throat-clearing openers).
+- Apply **Stop-Slop** rules as defined in SKILL.md (strict active voice, absolute adverb ban, zero em-dashes, cut throat-clearing openers).
 - Integrate:
   - Finished B1 German studies (private, planning for B2).
   - Active work with local LLMs, RAG, and LangGraph architectures.

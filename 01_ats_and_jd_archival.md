@@ -13,7 +13,7 @@ Analyze the target job description (JD) against the candidate's base resume and 
 Before any scoring or analysis, perform the following verification and loading steps:
 1. **Dependency Installation:** The agent MUST run the pip install command to guarantee all required packages in `requirements.txt` are installed before execution:
    ```powershell
-   C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe -m pip install -r "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\requirements.txt"
+   C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe -m pip install -q -r "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\requirements.txt"
    ```
 2. **Load base resume:** Load the candidate's base resume from the detected language folder:
    - `resume.md` (use `resume_de.md` for German JDs)
@@ -99,18 +99,7 @@ improvement_blueprint:
       - "[Specific action: e.g., swap Project X for Project Y from portfolio]"
       - "[Specific action: e.g., add missing keyword 'dbt' to Technical Skills]"
       - "[Specific action: e.g., rewrite IBM bullet 3 to include a throughput metric]"
-# --- Populated by Step 2 only. Do not fill during Step 1. ---
-post_rewrite_ats_score:
-  ats_score_matrix:
-    keywords_and_terminology: { max_score: 25, current_score: null, evaluation_criteria: "..." }
-    experience_relevance: { max_score: 25, current_score: null, evaluation_criteria: "..." }
-    technical_skills: { max_score: 20, current_score: null, evaluation_criteria: "..." }
-    formatting_and_parse: { max_score: 15, current_score: null, evaluation_criteria: "..." }
-    soft_skills_and_language: { max_score: 15, current_score: null, evaluation_criteria: "..." }
-    total_score: null
-  score_delta: null
-  score_gate_verdict: null
-  remaining_gaps: []
+# post_rewrite_ats_score: populated by Step 2 only — do not fill during Step 1.
 ```
 
 ### B. `Job_Description.yaml` Schema
@@ -149,4 +138,4 @@ C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "C:\Users\saga
 
 ---
 ### ATTACHMENTS FOR PROCESSING
-[PASTE JOB DESCRIPTION HERE]
+Paste the raw Job Description text below this line.
