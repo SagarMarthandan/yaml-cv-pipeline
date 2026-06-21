@@ -1,6 +1,7 @@
 ---
 name: yaml-cv-pipeline
-description: Use when the user wants to generate an ATS-optimized resume and cover letter from a job description. Runs a 3-step pipeline: ATS analysis & JD archival, resume rewrite & layout audit, and cover letter generation. Trigger on keywords like "job description", "resume", "cover letter", "ATS", "apply", "job application", "tailor resume", "optimize resume".
+description: >-
+  Use when the user wants to generate an ATS-optimized resume and cover letter from a job description. Runs a 3-step pipeline: ATS analysis & JD archival, resume rewrite & layout audit, and cover letter generation. Trigger on keywords like "job description", "resume", "cover letter", "ATS", "apply", "job application", "tailor resume", "optimize resume".
 dependencies: python>=3.10, pyyaml, reportlab, pypdf, stop-slop
 ---
 

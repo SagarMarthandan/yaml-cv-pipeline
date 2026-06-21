@@ -159,6 +159,14 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v11 — YAML Frontmatter Syntax Fix
+**Files:** `SKILL.md`
+
+- Converted the description in `SKILL.md` frontmatter to use a YAML block scalar (`>-`).
+- Resolves parsing errors where unescaped colons and quotes within the description caused invalid YAML syntax.
+
+---
+
 ### v10 — ReportLab Only for Job Description Archival
 **Files:** `renderers/job_description.py`, `SKILL.md`
 
