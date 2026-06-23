@@ -39,6 +39,7 @@ End-to-end pipeline that takes a **Job Description (JD)** and produces a tailore
 - **Working Directory:** `C:\Users\sagar\Documents\YAML-CV\Applications\`
 - **Pipeline Script Structure:**
   - `yaml_to_pdf.py` — entry point; routes YAML files to the correct renderer
+  - `closest_location.py` — computes the closest candidate city (Kiel, Frankfurt, Berlin, Köln) based on job location
   - `renderers/utils.py` — shared utilities (`escape_latex`, color constants, `run_pdflatex`)
   - `renderers/resume.py` — Resume renderer (LaTeX primary, ReportLab fallback)
   - `renderers/cover_letter.py` — Cover Letter renderer (LaTeX primary, ReportLab fallback)
@@ -66,7 +67,7 @@ The user must provide:
 
 Read and execute the full instructions in [01_ats_and_jd_archival.md](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/01_ats_and_jd_archival.md).
 
-Runs dependency check, parses and archives the job description, scores the base resume, and generates a tailored project list using the Zvec tool.
+Runs dependency check, parses and archives the job description, scores the base resume, performs location tailoring to find the closest candidate city, and generates a tailored project list using the Zvec tool.
 
 **Output:** `ATS_Report.yaml`, `ATS_Report.pdf`, `Job_Description.yaml`, `Job_Description.pdf`, and `project_info.md` in `[Company Name] — [Job Role]/` folder.
 
@@ -103,14 +104,14 @@ If the compilation fails:
 ## Completion Checklist
 
 After all 3 steps complete, verify:
-- [ ] `ATS_Report.yaml` exists in the company folder with pre and post rewrite scores
+- [ ] `ATS_Report.yaml` exists in the company folder with pre and post rewrite scores, including `closest_candidate_location`
 - [ ] `ATS_Report.pdf` is generated and `post_rewrite_ats_score` block is populated
-- [ ] `Job_Description.yaml` & `Job_Description.pdf` are generated
+- [ ] `Job_Description.yaml` (with `location` key) & `Job_Description.pdf` are generated
 - [ ] `project_info.md` (tailored project list) is generated in the company folder
-- [ ] `Resume.yaml` & `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` are generated
+- [ ] `Resume.yaml` & `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` are generated with the tailored closest location
 - [ ] `SAGAR_MARTHANDAN_Resume.tex` / `SAGAR_MARTHANDAN_Lebenslauf.tex` & `SAGAR_MARTHANDAN_Cover_Letter.tex` / `SAGAR_MARTHANDAN_Anschreiben.tex` are preserved in the folder
 - [ ] `Layout_Audit_Report.yaml` is generated with all eye-test diagnostics at Pass status
-- [ ] `Cover_Letter.yaml` & `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf` are generated
+- [ ] `Cover_Letter.yaml` & `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf` are generated with the tailored closest location in the sender address and date fields
 - [ ] Professional Experience bullet points are strictly single-line and <= 105 characters
 - [ ] Project entries are in single-paragraph format, with name + `---` + description (no bullets), each <= 300 characters (<= 250 characters for German) and fitting on <= 3 lines
 - [ ] Summary section is exactly 4 lines and <= 420 characters (<= 380 characters for German Zusammenfassung)

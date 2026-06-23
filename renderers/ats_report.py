@@ -29,7 +29,7 @@ def create_ats_report_pdf(data, output_path):
 
 def _create_ats_report_pdf_reportlab(data, output_path):
     """ReportLab fallback renderer for ATS_Report.yaml."""
-    margin = 0.75 * inch
+    margin = 0.3 * inch
     doc = SimpleDocTemplate(
         output_path, pagesize=A4,
         leftMargin=margin, rightMargin=margin,
@@ -104,7 +104,7 @@ def _create_ats_report_pdf_reportlab(data, output_path):
                        Paragraph(f'<b><font color="{score_color}">{total_score}</font></b>', h3),
                        Paragraph('<b>100</b>', h3), Paragraph('', body)])
 
-    score_table = Table(table_data, colWidths=[140, 40, 35, 235])
+    score_table = Table(table_data, colWidths=[140, 40, 35, printable_width - 215])
     score_table.setStyle(TableStyle([
         ('BACKGROUND',    (0,0), (-1,0), colors.HexColor('#f0f0f0')),
         ('LINEBELOW',     (0,0), (-1,0), 0.5, LINE_COLOR),
@@ -246,7 +246,7 @@ def _create_ats_report_pdf_reportlab(data, output_path):
             Paragraph('<b>100</b>', h3), Paragraph('', body)
         ])
 
-        post_tbl = Table(post_table_data, colWidths=[140, 40, 35, 235])
+        post_tbl = Table(post_table_data, colWidths=[140, 40, 35, printable_width - 215])
         post_tbl.setStyle(TableStyle([
             ('BACKGROUND',    (0,0), (-1,0), colors.HexColor('#f0f0f0')),
             ('LINEBELOW',     (0,0), (-1,0), 0.5, LINE_COLOR),

@@ -28,7 +28,7 @@ def create_job_description_pdf(data, output_path):
 # ── ReportLab fallback ────────────────────────────────────────────────────────
 
 def _create_job_description_pdf_reportlab(data, output_path):
-    margin = 0.8 * inch
+    margin = 0.3 * inch
     doc = SimpleDocTemplate(
         output_path, pagesize=A4,
         leftMargin=margin, rightMargin=margin,

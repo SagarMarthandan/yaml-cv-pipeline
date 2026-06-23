@@ -80,10 +80,11 @@ The entire process is organized into 3 primary sequential steps, executed automa
 - **ATS Pre-Scoring:** Grades the base resume against a calibrated 5-category German-market matrix (max 100 points).
   - **Score Gate:** If the ATS score is `< 85`, the pipeline triggers a `HOLD` verdict, presenting specific remedy suggestions (e.g., missing keywords, project mismatches). If `>= 85`, it sets `PROCEED`.
 - **RAG-based Project Selector:** Queries a local **Zvec vector database** (populated offline from your master portfolio) to search and write the top 4 matching projects to a tailored `project_info.md` file — distilled to title + description + tools only (no code blocks, badges, or noise sections).
+- **Location Tailoring:** Extracts the job location from the job description and executes `closest_location.py` to automatically compute the closest candidate location among Kiel (home), Frankfurt (friend), Berlin (friend), and Köln (friend) based on great-circle distance.
 - **Outputs:** `ATS_Report.yaml` & `Job_Description.yaml` (plus their compiled `.pdf` documents) and the tailored `project_info.md`.
 
 ### STEP 2: Resume Rewrite & Visual Layout Audit
-- **Tuned Resume Generation:** Writes `Resume.yaml` by tailoring descriptions, skills, and summary to align with the target role archetype and the retrieved local projects.
+- **Tuned Resume Generation:** Writes `Resume.yaml` by tailoring descriptions, skills, and summary to align with the target role archetype and the retrieved local projects, and sets the contact location to the computed closest candidate city.
 - **LaTeX Compilation & Project Format Polish:** Generates a professional LaTeX resume (`SAGAR_MARTHANDAN_Resume.tex` or `SAGAR_MARTHANDAN_Lebenslauf.tex` for German) and converts project listings from standard bullet points into a compact, single-paragraph prose block with tools woven in naturally.
 - **Uniform Spacing:** All project and experience entries are separated by a consistent `\vspace{6pt}` — no double-spacing, no variable gaps.
 - **Constraints & Eye-Test Audit:** Runs character-length audits:
@@ -96,7 +97,7 @@ The entire process is organized into 3 primary sequential steps, executed automa
 - **Outputs:** `Resume.yaml`, `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` (along with preserved LaTeX `.tex` sources), `Layout_Audit_Report.yaml`, and the post-rewrite ATS rescoring results updated inside `ATS_Report.yaml`.
 
 ### STEP 3: Cover Letter Generation
-- **Geschäftsbrief Layout:** Generates a metric-grounded cover letter adapted to formal German business formatting.
+- **Geschäftsbrief Layout:** Generates a metric-grounded cover letter adapted to formal German business formatting, set to the computed closest candidate location (both in the sender address and date/city header).
 - **Strict Limits:** Restricts cover letter content to exactly one page, 4 paragraphs, and **250–320 words** total (restricted to **180–240 words** for German cover letters to prevent A4 overflow).
 - **Outputs:** `Cover_Letter.yaml` and compiled `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf` (along with preserved LaTeX `.tex` sources).
 
@@ -133,6 +134,7 @@ C:\Users\sagar\Documents\YAML-CV\
 │       ├── 03_cover_letter.md            # Step 3 detailed agent rules
 │       ├── requirements.txt              # Pipeline dependencies
 │       ├── yaml_to_pdf.py                # Main YAML compilation router
+│       ├── closest_location.py           # Job location tailoring distance calculator
 │       ├── zvec_portfolio_search.py      # Zvec search, embedding & distillation engine
 │       └── renderers\                    # LaTeX/ReportLab rendering handlers
 └── Applications\
@@ -159,6 +161,15 @@ To execute the pipeline:
 ---
 
 ## 📋 Changelog
+
+### v13 — Job Location Tailoring
+**Files:** `SKILL.md`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `closest_location.py`, `README.md`
+
+- Introduced a location-tailoring mechanism that extracts the job location from the job description.
+- Created `closest_location.py` to map coordinates and compute the closest candidate city among Kiel (home), Frankfurt (friend), Berlin (friend), and Köln (friend).
+- Updated pipeline steps to propagate the closest candidate city to `Resume.yaml` and `Cover_Letter.yaml` addresses and dates.
+
+---
 
 ### v12 — Pipeline Token Optimizations & Google Sans Code Font
 **Files:** `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `SKILL.md`, `README.md`, `zvec_portfolio_search.py`, `renderers/utils.py`, `renderers/ats_report.py`, `renderers/job_description.py`

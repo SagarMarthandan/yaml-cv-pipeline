@@ -13,9 +13,9 @@ Generate a formal, high-impact cover letter in YAML (`Cover_Letter.yaml`) ground
 ### 1. Structure & Layout Standard
 - Match target JD language exactly.
 - Formal Geschäftsbrief layout:
-  - **Sender Block:** Name, address, phone, email.
+  - **Sender Block:** Name, address (set to `closest_candidate_location` read from `ATS_Report.yaml` in Step 1), phone, email.
   - **Recipient Block:** Company name, hiring team, company address.
-  - **Date (Right-Aligned):** City, date (e.g. Kiel, 30. Mai 2026).
+  - **Date (Right-Aligned):** Closest city (read from `closest_candidate_location` in `ATS_Report.yaml` in Step 1), date (e.g., "Frankfurt, 30. Mai 2026" or "Kiel, 30. Mai 2026").
   - **Subject Line:** Bold, single line (e.g., "Bewerbung als [Title]").
   - **Opening Salutation:** Formal addressing of team/manager.
   - **Body Prose (English Cover Letter):** Max 4 paragraphs, 250–320 words total (must fit on a single A4 page).
@@ -38,14 +38,14 @@ Save inside the job folder:
 type: cover_letter
 sender:
   name: SAGAR MARTHANDAN
-  address: "Kiel, Germany"
+  address: "[Closest candidate location — read from closest_candidate_location in ATS_Report.yaml]"
   phone: "+49 176 74138359"
   email: "sagar.marthandan@yahoo.com"
 recipient:
   company: "[Company Name]"
   department: "Hiring Team"
   address: "[Company Address]"
-date: "Kiel, [Date]"
+date: "[Closest City (e.g. Frankfurt or Kiel)], [Date]"
 subject: "Bewerbung als [Title] / Application for [Title]"
 salutation: "Sehr geehrte Damen und Herren, / Dear Hiring Team,"
 paragraphs:

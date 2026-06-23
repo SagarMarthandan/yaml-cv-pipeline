@@ -13,6 +13,7 @@ Generate a tailored, high-scannability resume (`Resume.yaml`) directly in struct
 ### 1. Document Rewrite & Project Selection
 - **Role Archetype Alignment:** Bias project order and phrasing toward the archetype detected in Step 1 (e.g., lead with archetype-aligned projects).
 - **Match Language:** Completely translate resume details (including job titles, summaries, bullets, and section headers) to the JD language confirmed in Step 1. Specify the target language in `Resume.yaml` using a top-level `language` key (e.g., `language: German` or `language: English`).
+- **Tailor Candidate Location:** Load `ATS_Report.yaml` and read the `closest_candidate_location` value computed in Step 1. Set the candidate location `contact_info.location` in `Resume.yaml` to this closest city (e.g., `"Frankfurt, Germany"` instead of defaulting to `"Kiel, Germany"`) to establish local alignment with the employer's region.
 - **Preserve Employment Dates:** Copy all employment date ranges (start and end month/year) exactly from the base resume. Do not generalize, approximate, or omit them.
 - **Section Order:** Plain uppercase header titles (no numeric prefixes) in the target language in this exact order:
   1. Summary (Zusammenfassung)
@@ -126,7 +127,7 @@ type: resume
 language: "English/German"
 contact_info:
   name: "SAGAR MARTHANDAN"
-  location: "Kiel, Germany"
+  location: "[Closest candidate location — read from closest_candidate_location in ATS_Report.yaml]"
   phone: "+49 176 74138359"
   email: "sagar.marthandan@yahoo.com"
   linkedin: "linkedin.com/in/sagarmarthandan"
