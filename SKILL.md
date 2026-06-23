@@ -31,12 +31,12 @@ End-to-end pipeline that takes a **Job Description (JD)** and produces a tailore
 ## Prerequisites
 
 - **Base Files Directory:**
-  - **English:** `C:\Users\sagar\Documents\YAML-CV\Base Files\English\` (Base resume files)
-  - **German:** `C:\Users\sagar\Documents\YAML-CV\Base Files\German\` (Base German files)
-  - **Photo:** `C:\Users\sagar\Documents\YAML-CV\Base Files\Photo\` (Photo image files)
-  - **Repo Info:** `C:\Users\sagar\Documents\YAML-CV\Base Files\Repo Info\` (Master portfolio `repo info.md` & `zvec_portfolio` vector database index)
+  - **English:** `../Base Files/English/` (Base resume files)
+  - **German:** `../Base Files/German/` (Base German files)
+  - **Photo:** `../Base Files/Photo/` (Photo image files)
+  - **Repo Info:** `../Base Files/Repo Info/` (Master portfolio `repo info.md` & `zvec_portfolio` vector database index)
 - **Python Installation:** Python 3.10+ with dependencies installed from [requirements.txt](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/requirements.txt) (`pyyaml`, `reportlab`, `pypdf`, `zvec`, `sentence-transformers` installed)
-- **Working Directory:** `C:\Users\sagar\Documents\YAML-CV\Applications\`
+- **Working Directory:** `Applications/` (relative to project root)
 - **Pipeline Script Structure:**
   - `yaml_to_pdf.py` — entry point; routes YAML files to the correct renderer
   - `closest_location.py` — computes the closest candidate city (Kiel, Frankfurt, Berlin, Köln) based on job location

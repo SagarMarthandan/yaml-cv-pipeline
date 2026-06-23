@@ -108,7 +108,7 @@ The entire process is organized into 3 primary sequential steps, executed automa
 To eliminate all cloud-based API key requirements, embedding costs, and data leakage, the RAG search runs **100% locally and offline**:
 - **Vector DB:** Utilizes [Zvec](https://pypi.org/project/zvec/) as an embedded local database storage engine.
 - **Local Model:** Generates 384-dimensional embeddings using the local `sentence-transformers` library running the lightweight `all-MiniLM-L6-v2` model (~90MB).
-- **Auto-Ingestion:** The search script ([zvec_portfolio_search.py](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/zvec_portfolio_search.py)) automatically reads, chunks, embeds, and indexes your master portfolio ([repo info.md](file:///C:/Users/sagar/Documents/YAML-CV/Base%20Files/Repo%20Info/repo%20info.md)) into the database folder [zvec_portfolio](file:///C:/Users/sagar/Documents/YAML-CV/Base%20Files/Repo%20Info/zvec_portfolio) if it does not already exist.
+- **Auto-Ingestion:** The search script ([zvec_portfolio_search.py](zvec_portfolio_search.py)) automatically reads, chunks, embeds, and indexes your master portfolio ([repo info.md](../../Base%20Files/Repo%20Info/repo%20info.md)) into the database folder [zvec_portfolio](../../Base%20Files/Repo%20Info/zvec_portfolio) if it does not already exist.
 - **Distilled Output:** Each matched project is written to `project_info.md` as a compact 2–3 line summary (title + first prose paragraph + tech-stack line). Full content is used for semantic ranking; only signal is written to file.
 - **Re-indexing:** Delete the `zvec_portfolio` folder manually to trigger a clean re-index after updating `repo info.md`.
 
@@ -117,7 +117,7 @@ To eliminate all cloud-based API key requirements, embedding costs, and data lea
 ## 📂 Project Directory Structure
 
 ```
-C:\Users\sagar\Documents\YAML-CV\
+YAML-CV/
 ├── Base Files\
 │   ├── English\              # English base resume.md
 │   ├── German\               # German base resume_de.md
@@ -156,11 +156,29 @@ Since all the pipeline steps are natively codified into the agent's custom skill
 To execute the pipeline:
 1. Paste the target **Job Description** (JD) into the chat.
 2. Type: **`execute yaml-cv-pipeline`** (or keywords like *"tailor resume"* / *"optimize resume"*).
-3. The agent will automatically run the end-to-end flow: installing dependencies, searching matching projects using Zvec, compiling the ATS reports, and writing the final tailored files to the `C:\Users\sagar\Documents\YAML-CV\Applications\` directory.
+3. The agent will automatically run the end-to-end flow: installing dependencies, searching matching projects using Zvec, compiling the ATS reports, and writing the final tailored files to the `Applications/` directory.
 
 ---
 
 ## 📋 Changelog
+
+### v17 — Scope Leak Fixes & Portability Improvements
+**Files:** `config.py`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `renderers/utils.py`, `SKILL.md`, `README.md`
+
+**Scope Leak Fixes:**
+- Made all Base Files paths relative and configurable via environment variables (`YAML_CV_MD_PATH`, `YAML_CV_DB_PATH`)
+- Replaced hardcoded Python interpreter paths with `python` to support local/venv installations
+- Restricted font search to local directories only (`project/fonts/`, `../Base Files/fonts/`) with `YAML_CV_FONT_DIRS` override
+- Updated all working directory references from absolute paths to relative `Applications/`
+- Fixed photo path references to use relative paths
+- Updated documentation to reflect relative path structure
+
+**Portability:**
+- Skill now operates entirely within its scope without accessing files outside the project
+- Supports locally installed dependencies without requiring specific Python installation paths
+- Environment variable overrides for all critical paths for maximum flexibility
+
+---
 
 ### v16 — Performance & Code Quality Optimizations
 **Files:** `zvec_portfolio_search.py`, `renderers/utils.py`, `renderers/cover_letter.py`, `closest_location.py`, `yaml_to_pdf.py`, `config.py`, `requirements.txt`, `test_closest_location.py`, `test_utils.py`

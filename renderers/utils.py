@@ -139,10 +139,18 @@ def _find_and_register_font_family(
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
 
-        dirs = [
-            os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "Windows", "Fonts"),
-            r"C:\Windows\Fonts"
-        ]
+        # Search in local font directories only (not system-wide)
+        # Can be overridden via YAML_CV_FONT_DIRS environment variable (colon-separated)
+        font_dirs_env = os.environ.get("YAML_CV_FONT_DIRS", "")
+        if font_dirs_env:
+            dirs = font_dirs_env.split(os.pathsep)
+        else:
+            # Default to local directories relative to project
+            script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            dirs = [
+                os.path.join(script_dir, "fonts"),
+                os.path.join(script_dir, "..", "Base Files", "fonts"),
+            ]
         
         regular_file, bold_file, italic_file, bold_italic_file = font_names
 
@@ -198,7 +206,7 @@ _GOOGLE_SANS_CODE_REGISTERED = [None]
 def register_google_sans_code() -> Tuple[str, str, str, str]:
     """
     Registers Google Sans Code TTF fonts with ReportLab.
-    Looks in LOCALAPPDATA/Microsoft/Windows/Fonts and C:/Windows/Fonts.
+    Looks in local font directories (project/fonts, ../Base Files/fonts) or YAML_CV_FONT_DIRS env var.
     Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) representing the registered font names,
     or falls back to ('Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique', 'Helvetica-BoldOblique') if not found.
     """
@@ -215,7 +223,7 @@ _LM_ROMAN_10_REGISTERED = [None]
 def register_lm_roman_10() -> Tuple[str, str, str, str]:
     """
     Registers LM Roman 10 TTF fonts with ReportLab.
-    Looks in LOCALAPPDATA/Microsoft/Windows/Fonts and C:/Windows/Fonts.
+    Looks in local font directories (project/fonts, ../Base Files/fonts) or YAML_CV_FONT_DIRS env var.
     Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) representing the registered font names,
     or falls back to ('Times-Roman', 'Times-Bold', 'Times-Italic', 'Times-BoldItalic') if not found.
     """

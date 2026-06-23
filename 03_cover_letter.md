@@ -60,13 +60,13 @@ signature_name: "Sagar Marthandan"
 ## Compilation Commands
 Compile the cover letter immediately:
 ```powershell
-cd "C:\Users\sagar\Documents\YAML-CV\Applications\[Company Name] — [Job Role]\"
+cd "Applications/[Company Name] — [Job Role]/"
 
 # Compile Cover Letter (English JD)
-python "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Cover_Letter.pdf"
+python "yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Cover_Letter.pdf"
 
 # Compile Cover Letter (German JD)
-python "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Anschreiben.pdf"
+python "yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Anschreiben.pdf"
 ```
 
 ---

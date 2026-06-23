@@ -65,7 +65,7 @@ def create_cover_letter_pdf(data, output_path):
 
 {{\\small
 \\textbf{{{sender_name}}} \\\\
-{sender_addr_str} \\\\
+{sender_addr} \\\\
 {sender_phone} \\\\
 {sender_email}
 }}
@@ -74,7 +74,7 @@ def create_cover_letter_pdf(data, output_path):
 
 \\textbf{{{rec_company}}} \\\\
 {rec_dept} \\\\
-{rec_addr_str}
+{rec_addr}
 
 \\vspace{{15pt}}
 

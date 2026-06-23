@@ -5,7 +5,7 @@ Analyze the target job description (JD) against the candidate's base resume and 
 
 ## Inputs
 - **Job Description (JD):** Paste target JD text at the bottom.
-- **Base Resume & Portfolio:** Loaded from `C:\Users\sagar\Documents\YAML-CV\Base Files\<Language>\` (automatically selected based on detected JD language: English or German).
+- **Base Resume & Portfolio:** Loaded from `../Base Files/<Language>/` (automatically selected based on detected JD language: English or German).
 
 ## Execution Rules
 
@@ -13,7 +13,7 @@ Analyze the target job description (JD) against the candidate's base resume and 
 Before any scoring or analysis, perform the following verification and loading steps:
 1. **Dependency Installation:** The agent MUST run the pip install command to guarantee all required packages in `requirements.txt` are installed before execution:
    ```powershell
-   C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe -m pip install -q -r "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\requirements.txt"
+   python -m pip install -q -r "requirements.txt"
    ```
 2. **Load base resume:** Load the candidate's base resume from the detected language folder:
    - `resume.md` (use `resume_de.md` for German JDs)
@@ -53,12 +53,12 @@ Populate each field of `improvement_blueprint` as follows:
 ### 5. Candidate Location Selection
 - Run the `closest_location.py` script on the created `Job_Description.yaml`:
   ```powershell
-  C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\closest_location.py" "Job_Description.yaml"
+  python "closest_location.py" "Job_Description.yaml"
   ```
 - Save the printed location (e.g. `Frankfurt, Germany`) under `closest_candidate_location` in the root of `ATS_Report.yaml`.
 
 ## Output Target & Directory Structure
-Create folder `C:\Users\sagar\Documents\YAML-CV\Applications\[Company Name] — [Job Role]\` and save three files:
+Create folder `Applications/[Company Name] — [Job Role]/` and save three files:
 - `ATS_Report.yaml`
 - `Job_Description.yaml`
 - `project_info.md` (tailored project portfolio generated via Zvec search)
@@ -134,20 +134,20 @@ sections:
 ## Compilation & Portfolio Search Commands
 Run the Zvec search, closest location utility, and the compiler immediately after writing the files to generate the assets:
 ```powershell
-cd "C:\Users\sagar\Documents\YAML-CV\Applications\[Company Name] — [Job Role]\"
+cd "Applications\[Company Name] — [Job Role]\"
 
 # 1. Search and generate the tailored project list using Zvec (fully offline)
-C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\zvec_portfolio_search.py" "Job_Description.yaml" "project_info.md"
+python "zvec_portfolio_search.py" "Job_Description.yaml" "project_info.md"
 
 # 2. Run closest location script to determine the closest target location
-C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\closest_location.py" "Job_Description.yaml"
+python "closest_location.py" "Job_Description.yaml"
 # Note: Read the printed output and save it as closest_candidate_location in ATS_Report.yaml!
 
 # 3. Compile ATS Report
-C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "ATS_Report.yaml" "ATS_Report.pdf"
+python "yaml_to_pdf.py" "ATS_Report.yaml" "ATS_Report.pdf"
 
 # 4. Compile Job Description
-C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "C:\Users\sagar\Documents\YAML-CV\skills\yaml-cv-pipeline\yaml_to_pdf.py" "Job_Description.yaml" "Job_Description.pdf"
+python "yaml_to_pdf.py" "Job_Description.yaml" "Job_Description.pdf"
 ```
 
 ---
