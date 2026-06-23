@@ -5,6 +5,7 @@ import os
 import sys
 import subprocess
 import shutil
+from typing import Tuple
 
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import (
@@ -27,7 +28,7 @@ LINE_COLOR = colors.HexColor("#111111")
 LINK_COLOR = colors.HexColor("#0000EE")
 
 
-def escape_latex(text):
+def escape_latex(text: str) -> str:
     """Escape special LaTeX characters in a string."""
     if not isinstance(text, str):
         return text
@@ -75,7 +76,7 @@ def escape_latex(text):
     return "".join(result)
 
 
-def run_pdflatex(tex_filename, pdf_dir, label="document", keep_tex=False):
+def run_pdflatex(tex_filename: str, pdf_dir: str, label: str = "document", keep_tex: bool = False) -> bool:
     """
     Run pdflatex twice in pdf_dir and raise on failure.
     Cleans up auxiliary files afterwards.
@@ -113,147 +114,139 @@ def run_pdflatex(tex_filename, pdf_dir, label="document", keep_tex=False):
                     print(f"Warning: Could not remove {tmp}: {e}", file=sys.stderr)
 
 
-_GOOGLE_SANS_CODE_REGISTERED = None
+def _find_and_register_font_family(
+    family_name: str,
+    font_names: Tuple[str, str, str, str],
+    fallback_names: Tuple[str, str, str, str],
+    cache_var: list
+) -> Tuple[str, str, str, str]:
+    """
+    Helper function to find font files in system directories and register them with ReportLab.
+    
+    Args:
+        family_name: Name of the font family to register
+        font_names: Tuple of (regular, bold, italic, bold_italic) font filenames
+        fallback_names: Tuple of fallback font names if fonts not found
+        cache_var: List containing the cached registration result (mutable for closure)
+    
+    Returns:
+        Tuple of (regular, bold, italic, bold_italic) registered font names
+    """
+    if cache_var[0] is not None:
+        return cache_var[0]
 
-def register_google_sans_code():
+    try:
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+
+        dirs = [
+            os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "Windows", "Fonts"),
+            r"C:\Windows\Fonts"
+        ]
+        
+        regular_file, bold_file, italic_file, bold_italic_file = font_names
+
+        regular_path = None
+        bold_path = None
+        italic_path = None
+        bold_italic_path = None
+
+        for d in dirs:
+            if not d or not os.path.exists(d):
+                continue
+            r_p = os.path.join(d, regular_file)
+            b_p = os.path.join(d, bold_file)
+            i_p = os.path.join(d, italic_file)
+            bi_p = os.path.join(d, bold_italic_file)
+            
+            if os.path.exists(r_p) and os.path.exists(b_p):
+                regular_path = r_p
+                bold_path = b_p
+                if os.path.exists(i_p):
+                    italic_path = i_p
+                if os.path.exists(bi_p):
+                    bold_italic_path = bi_p
+                break
+
+        if not regular_path or not bold_path:
+            cache_var[0] = fallback_names
+            return fallback_names
+
+        pdfmetrics.registerFont(TTFont(f"{family_name}", regular_path))
+        pdfmetrics.registerFont(TTFont(f"{family_name}-Bold", bold_path))
+        pdfmetrics.registerFont(TTFont(f"{family_name}-Italic", italic_path if italic_path else regular_path))
+        pdfmetrics.registerFont(TTFont(f"{family_name}-BoldItalic", bold_italic_path if bold_italic_path else bold_path))
+        
+        pdfmetrics.registerFontFamily(
+            family_name,
+            normal=family_name,
+            bold=f"{family_name}-Bold",
+            italic=f"{family_name}-Italic",
+            boldItalic=f"{family_name}-BoldItalic",
+        )
+        registered_names = (family_name, f"{family_name}-Bold", f"{family_name}-Italic", f"{family_name}-BoldItalic")
+        cache_var[0] = registered_names
+        return registered_names
+    except Exception as e:
+        print(f"Warning: Could not register {family_name}: {e}", file=sys.stderr)
+        cache_var[0] = fallback_names
+        return fallback_names
+
+
+_GOOGLE_SANS_CODE_REGISTERED = [None]
+
+def register_google_sans_code() -> Tuple[str, str, str, str]:
     """
     Registers Google Sans Code TTF fonts with ReportLab.
     Looks in LOCALAPPDATA/Microsoft/Windows/Fonts and C:/Windows/Fonts.
     Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) representing the registered font names,
     or falls back to ('Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique', 'Helvetica-BoldOblique') if not found.
     """
-    global _GOOGLE_SANS_CODE_REGISTERED
-    if _GOOGLE_SANS_CODE_REGISTERED is not None:
-        return _GOOGLE_SANS_CODE_REGISTERED
-
-    try:
-        from reportlab.pdfbase import pdfmetrics
-        from reportlab.pdfbase.ttfonts import TTFont
-
-        dirs = [
-            os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "Windows", "Fonts"),
-            r"C:\Windows\Fonts"
-        ]
-        
-        regular_file = "GoogleSansCode-Regular.ttf"
-        bold_file = "GoogleSansCode-Bold.ttf"
-        italic_file = "GoogleSansCode-Italic.ttf"
-        bold_italic_file = "GoogleSansCode-BoldItalic.ttf"
-
-        regular_path = None
-        bold_path = None
-        italic_path = None
-        bold_italic_path = None
-
-        for d in dirs:
-            if not d or not os.path.exists(d):
-                continue
-            r_p = os.path.join(d, regular_file)
-            b_p = os.path.join(d, bold_file)
-            i_p = os.path.join(d, italic_file)
-            bi_p = os.path.join(d, bold_italic_file)
-            
-            if os.path.exists(r_p) and os.path.exists(b_p):
-                regular_path = r_p
-                bold_path = b_p
-                if os.path.exists(i_p):
-                    italic_path = i_p
-                if os.path.exists(bi_p):
-                    bold_italic_path = bi_p
-                break
-
-        if not regular_path or not bold_path:
-            _GOOGLE_SANS_CODE_REGISTERED = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
-            return _GOOGLE_SANS_CODE_REGISTERED
-
-        pdfmetrics.registerFont(TTFont("GoogleSansCode", regular_path))
-        pdfmetrics.registerFont(TTFont("GoogleSansCode-Bold", bold_path))
-        pdfmetrics.registerFont(TTFont("GoogleSansCode-Italic", italic_path if italic_path else regular_path))
-        pdfmetrics.registerFont(TTFont("GoogleSansCode-BoldItalic", bold_italic_path if bold_italic_path else bold_path))
-        
-        pdfmetrics.registerFontFamily(
-            "GoogleSansCode",
-            normal="GoogleSansCode",
-            bold="GoogleSansCode-Bold",
-            italic="GoogleSansCode-Italic",
-            boldItalic="GoogleSansCode-BoldItalic",
-        )
-        _GOOGLE_SANS_CODE_REGISTERED = ("GoogleSansCode", "GoogleSansCode-Bold", "GoogleSansCode-Italic", "GoogleSansCode-BoldItalic")
-        return _GOOGLE_SANS_CODE_REGISTERED
-    except Exception as e:
-        print(f"Warning: Could not register Google Sans Code: {e}", file=sys.stderr)
-        _GOOGLE_SANS_CODE_REGISTERED = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
-        return _GOOGLE_SANS_CODE_REGISTERED
+    return _find_and_register_font_family(
+        family_name="GoogleSansCode",
+        font_names=("GoogleSansCode-Regular.ttf", "GoogleSansCode-Bold.ttf", "GoogleSansCode-Italic.ttf", "GoogleSansCode-BoldItalic.ttf"),
+        fallback_names=("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique"),
+        cache_var=_GOOGLE_SANS_CODE_REGISTERED
+    )
 
 
-_LM_ROMAN_10_REGISTERED = None
+_LM_ROMAN_10_REGISTERED = [None]
 
-def register_lm_roman_10():
+def register_lm_roman_10() -> Tuple[str, str, str, str]:
     """
     Registers LM Roman 10 TTF fonts with ReportLab.
     Looks in LOCALAPPDATA/Microsoft/Windows/Fonts and C:/Windows/Fonts.
     Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) representing the registered font names,
     or falls back to ('Times-Roman', 'Times-Bold', 'Times-Italic', 'Times-BoldItalic') if not found.
     """
-    global _LM_ROMAN_10_REGISTERED
-    if _LM_ROMAN_10_REGISTERED is not None:
-        return _LM_ROMAN_10_REGISTERED
+    return _find_and_register_font_family(
+        family_name="LMRoman10",
+        font_names=("lmroman10-regular.ttf", "lmroman10-bold.ttf", "lmroman10-italic.ttf", "lmroman10-bolditalic.ttf"),
+        fallback_names=("Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic"),
+        cache_var=_LM_ROMAN_10_REGISTERED
+    )
 
-    try:
-        from reportlab.pdfbase import pdfmetrics
-        from reportlab.pdfbase.ttfonts import TTFont
 
-        dirs = [
-            os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "Windows", "Fonts"),
-            r"C:\Windows\Fonts"
-        ]
-        
-        regular_file = "lmroman10-regular.ttf"
-        bold_file = "lmroman10-bold.ttf"
-        italic_file = "lmroman10-italic.ttf"
-        bold_italic_file = "lmroman10-bolditalic.ttf"
-
-        regular_path = None
-        bold_path = None
-        italic_path = None
-        bold_italic_path = None
-
-        for d in dirs:
-            if not d or not os.path.exists(d):
-                continue
-            r_p = os.path.join(d, regular_file)
-            b_p = os.path.join(d, bold_file)
-            i_p = os.path.join(d, italic_file)
-            bi_p = os.path.join(d, bold_italic_file)
-            
-            if os.path.exists(r_p) and os.path.exists(b_p):
-                regular_path = r_p
-                bold_path = b_p
-                if os.path.exists(i_p):
-                    italic_path = i_p
-                if os.path.exists(bi_p):
-                    bold_italic_path = bi_p
-                break
-
-        if not regular_path or not bold_path:
-            _LM_ROMAN_10_REGISTERED = ("Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic")
-            return _LM_ROMAN_10_REGISTERED
-
-        pdfmetrics.registerFont(TTFont("LMRoman10", regular_path))
-        pdfmetrics.registerFont(TTFont("LMRoman10-Bold", bold_path))
-        pdfmetrics.registerFont(TTFont("LMRoman10-Italic", italic_path if italic_path else regular_path))
-        pdfmetrics.registerFont(TTFont("LMRoman10-BoldItalic", bold_italic_path if bold_italic_path else bold_path))
-        
-        pdfmetrics.registerFontFamily(
-            "LMRoman10",
-            normal="LMRoman10",
-            bold="LMRoman10-Bold",
-            italic="LMRoman10-Italic",
-            boldItalic="LMRoman10-BoldItalic",
-        )
-        _LM_ROMAN_10_REGISTERED = ("LMRoman10", "LMRoman10-Bold", "LMRoman10-Italic", "LMRoman10-BoldItalic")
-        return _LM_ROMAN_10_REGISTERED
-    except Exception as e:
-        print(f"Warning: Could not register LM Roman 10: {e}", file=sys.stderr)
-        _LM_ROMAN_10_REGISTERED = ("Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic")
-        return _LM_ROMAN_10_REGISTERED
+def format_address(address, latex: bool = False) -> str:
+    """
+    Format address for output (LaTeX or HTML/ReportLab).
+    
+    Args:
+        address: Address as string or list of strings
+        latex: If True, format for LaTeX (with \\\\). If False, format for HTML (with <br/>)
+    
+    Returns:
+        Formatted address string
+    """
+    from typing import Union, List
+    
+    if isinstance(address, list):
+        if latex:
+            return " \\\\\n  ".join([escape_latex(line) for line in address])
+        else:
+            return "<br/>".join(address)
+    else:
+        if latex:
+            return " \\\\\n  ".join([escape_latex(line) for line in address.split("\n")])
+        else:
+            return address.replace("\n", "<br/>")

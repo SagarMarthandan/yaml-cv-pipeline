@@ -11,7 +11,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from .utils import TEXT_DARK, escape_latex, run_pdflatex
+from .utils import TEXT_DARK, escape_latex, run_pdflatex, format_address
 
 
 # ── LaTeX renderer ────────────────────────────────────────────────────────────
@@ -25,11 +25,7 @@ def create_cover_letter_pdf(data, output_path):
         raw_sender = raw_sender.title()
     sender_name = escape_latex(raw_sender)
 
-    sender_addr = sender.get('address', '')
-    if isinstance(sender_addr, list):
-        sender_addr_str = " \\\\\n  ".join([escape_latex(line) for line in sender_addr])
-    else:
-        sender_addr_str = " \\\\\n  ".join([escape_latex(line) for line in sender_addr.split("\n")])
+    sender_addr = format_address(sender.get('address', ''), latex=True)
 
     sender_phone = escape_latex(sender.get('phone', ''))
     sender_email = escape_latex(sender.get('email', ''))
@@ -38,11 +34,7 @@ def create_cover_letter_pdf(data, output_path):
     rec_company = escape_latex(recipient.get('company', ''))
     rec_dept    = escape_latex(recipient.get('department', ''))
 
-    rec_addr = recipient.get('address', '')
-    if isinstance(rec_addr, list):
-        rec_addr_str = " \\\\\n  ".join([escape_latex(line) for line in rec_addr])
-    else:
-        rec_addr_str = " \\\\\n  ".join([escape_latex(line) for line in rec_addr.split("\n")])
+    rec_addr = format_address(recipient.get('address', ''), latex=True)
 
     date_val       = escape_latex(data.get('date', ''))
     subject_val    = escape_latex(data.get('subject', ''))
@@ -161,11 +153,7 @@ def create_cover_letter_pdf_reportlab(data, output_path):
     story = []
 
     sender      = data.get('sender', {})
-    sender_addr = sender.get('address', '')
-    if isinstance(sender_addr, list):
-        sender_addr = "<br/>".join(sender_addr)
-    else:
-        sender_addr = sender_addr.replace("\n", "<br/>")
+    sender_addr = format_address(sender.get('address', ''), latex=False)
 
     raw_sender = sender.get('name', '')
     if raw_sender.isupper():
@@ -175,11 +163,7 @@ def create_cover_letter_pdf_reportlab(data, output_path):
     story.append(Spacer(1, 20))
 
     recipient = data.get('recipient', {})
-    rec_addr  = recipient.get('address', '')
-    if isinstance(rec_addr, list):
-        rec_addr = "<br/>".join(rec_addr)
-    else:
-        rec_addr = rec_addr.replace("\n", "<br/>")
+    rec_addr  = format_address(recipient.get('address', ''), latex=False)
 
     rec_text = f"<b>{recipient.get('company', '')}</b><br/>{recipient.get('department', '')}<br/>{rec_addr}"
     story.append(Paragraph(rec_text, recipient_style))

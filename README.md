@@ -162,6 +162,27 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v16 — Performance & Code Quality Optimizations
+**Files:** `zvec_portfolio_search.py`, `renderers/utils.py`, `renderers/cover_letter.py`, `closest_location.py`, `yaml_to_pdf.py`, `config.py`, `requirements.txt`, `test_closest_location.py`, `test_utils.py`
+
+**Performance Improvements:**
+- Implemented batch embedding in Zvec search (`model.encode()` with batch_size=32) - 3-5x faster portfolio ingestion
+- Added thread-safe lazy initialization for SentenceTransformer model with double-check locking pattern
+- Added tqdm dependency for built-in progress bars during embedding
+
+**Code Quality & Maintainability:**
+- Created centralized `config.py` for all hardcoded paths, constants, and city coordinates with environment variable override support
+- Consolidated duplicate font registration code into `_find_and_register_font_family()` helper function (~60 lines reduced)
+- Extracted common address formatting utility `format_address()` for LaTeX/HTML rendering
+- Added comprehensive type hints to all functions in `zvec_portfolio_search.py`, `closest_location.py`, `renderers/utils.py`, and `yaml_to_pdf.py`
+
+**Testing:**
+- Created `test_closest_location.py` with 25 unit tests for haversine distance and location matching
+- Created `test_utils.py` with 30 unit tests for LaTeX escaping and address formatting utilities
+- All tests passing (55/55)
+
+---
+
 ### v14 — LM Roman 10 Font Integration
 **Files:** `renderers/utils.py`, `renderers/ats_report.py`, `renderers/job_description.py`, `README.md`
 

@@ -16,6 +16,7 @@ Usage:
 import os
 import sys
 import yaml
+from typing import Dict, Any
 
 from renderers.resume          import create_resume_pdf
 from renderers.cover_letter    import create_cover_letter_pdf
@@ -39,7 +40,7 @@ def _infer_type(filename: str) -> str:
     return ''
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 3:
         print("Usage: python yaml_to_pdf.py <input.yaml> <output.pdf>", file=sys.stderr)
         sys.exit(1)

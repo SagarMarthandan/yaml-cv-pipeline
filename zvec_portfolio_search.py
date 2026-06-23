@@ -9,37 +9,43 @@ a job description.
 import os
 import re
 import shutil
+import threading
+from typing import List, Dict, Tuple
 import zvec
 from sentence_transformers import SentenceTransformer
+from config import (
+    DEFAULT_MD_PATH,
+    DEFAULT_DB_PATH,
+    EMBEDDING_MODEL_NAME,
+    EMBEDDING_DIMENSION
+)
 
 # Suppress the HuggingFace Hub unauthenticated-request warning.
 # The model (all-MiniLM-L6-v2) is already cached locally; no network calls are made.
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 os.environ.setdefault("HF_HUB_DISABLE_IMPLICIT_TOKEN", "1")
 
-# Default configurations
-DEFAULT_MD_PATH = r"C:\Users\sagar\Documents\YAML-CV\Base Files\Repo Info\repo info.md"
-DEFAULT_DB_PATH = r"C:\Users\sagar\Documents\YAML-CV\Base Files\Repo Info\zvec_portfolio"
-EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
-EMBEDDING_DIMENSION = 384  # all-MiniLM-L6-v2 maps text to 384-dimensional vectors
-
-# Global model instance for caching
+# Global model instance and lock for thread-safe lazy initialization
 _model_instance = None
+_model_lock = threading.Lock()
 
 
 def get_embedding(text: str) -> list[float]:
-    """Fetch local vector embeddings using sentence-transformers."""
+    """Fetch local vector embeddings using sentence-transformers with thread-safe lazy initialization."""
     global _model_instance
     if _model_instance is None:
-        print(f"Loading local SentenceTransformer model '{EMBEDDING_MODEL_NAME}'...")
-        _model_instance = SentenceTransformer(EMBEDDING_MODEL_NAME)
+        with _model_lock:
+            # Double-check pattern to avoid loading model multiple times
+            if _model_instance is None:
+                print(f"Loading local SentenceTransformer model '{EMBEDDING_MODEL_NAME}'...")
+                _model_instance = SentenceTransformer(EMBEDDING_MODEL_NAME)
     
     # Generate embedding on local CPU/GPU and convert to normal list of floats
     vector = _model_instance.encode(text)
     return [float(x) for x in vector]
 
 
-def parse_repo_markdown(file_path: str) -> list[dict]:
+def parse_repo_markdown(file_path: str) -> List[Dict[str, str]]:
     """
     Parses repo info.md into individual project chunks by section headers.
     Avoids splitting on nested code block headers or build instruction headers.
@@ -115,7 +121,7 @@ def parse_repo_markdown(file_path: str) -> list[dict]:
     return projects
 
 
-def ingest_portfolio(markdown_path: str = DEFAULT_MD_PATH, db_path: str = DEFAULT_DB_PATH, force_recreate: bool = False):
+def ingest_portfolio(markdown_path: str = DEFAULT_MD_PATH, db_path: str = DEFAULT_DB_PATH, force_recreate: bool = False) -> None:
     """Chunks, embeds, and saves projects to Zvec."""
     if os.path.exists(db_path) and not force_recreate:
         print(f"Database already exists at: {db_path}. Skipping ingestion (force_recreate=False).")
@@ -160,14 +166,16 @@ def ingest_portfolio(markdown_path: str = DEFAULT_MD_PATH, db_path: str = DEFAUL
     
     collection = zvec.create_and_open(path=db_path, schema=schema)
     
+    # Batch embed all projects at once for better performance
+    print(f"Embedding {len(projects)} projects in batch...")
+    embeddings = _model_instance.encode([p['content'] for p in projects], batch_size=32, show_progress_bar=True)
+    embeddings_list = [[float(x) for x in emb] for emb in embeddings]
+
     docs = []
     for idx, proj in enumerate(projects):
-        print(f"[{idx+1}/{len(projects)}] Embedding and indexing: {proj['title']}")
-        embedding = get_embedding(proj['content'])
-        
         docs.append(zvec.Doc(
             id=f"proj_{idx}",
-            vectors={"embedding": embedding},
+            vectors={"embedding": embeddings_list[idx]},
             fields={"title": proj['title'], "text": proj['content']}
         ))
         
@@ -175,7 +183,7 @@ def ingest_portfolio(markdown_path: str = DEFAULT_MD_PATH, db_path: str = DEFAUL
     print("Database indexing complete.")
 
 
-def search_relevant_projects(job_description: str, top_k: int = 4, db_path: str = DEFAULT_DB_PATH) -> list[dict]:
+def search_relevant_projects(job_description: str, top_k: int = 4, db_path: str = DEFAULT_DB_PATH) -> List[Dict[str, any]]:
     """Queries Zvec to find the most relevant projects for a given JD."""
     if not os.path.exists(db_path):
         raise ValueError(f"Database not found at {db_path}. Please run ingestion first.")
@@ -203,7 +211,7 @@ def search_relevant_projects(job_description: str, top_k: int = 4, db_path: str 
     return matched_projects
 
 
-def distill_project(proj: dict) -> str:
+def distill_project(proj: Dict[str, str]) -> str:
     """
     Strips a project's raw markdown to just the signal Step 2 needs:
       - Title (the # heading)
