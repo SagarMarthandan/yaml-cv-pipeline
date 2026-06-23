@@ -2,6 +2,9 @@
 Unit tests for renderers/utils.py
 """
 import unittest
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from renderers.utils import escape_latex, format_address
 
 

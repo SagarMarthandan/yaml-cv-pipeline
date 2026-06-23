@@ -2,6 +2,9 @@
 Unit tests for closest_location.py
 """
 import unittest
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from closest_location import haversine, find_closest_candidate
 
 
