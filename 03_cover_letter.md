@@ -63,10 +63,10 @@ Compile the cover letter immediately:
 cd "Applications/[Company Name] — [Job Role]/"
 
 # Compile Cover Letter (English JD)
-python "yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Cover_Letter.pdf"
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Cover_Letter.pdf"
 
 # Compile Cover Letter (German JD)
-python "yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Anschreiben.pdf"
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Anschreiben.pdf"
 ```
 
 ---

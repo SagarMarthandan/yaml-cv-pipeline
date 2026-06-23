@@ -13,7 +13,7 @@ Analyze the target job description (JD) against the candidate's base resume and 
 Before any scoring or analysis, perform the following verification and loading steps:
 1. **Dependency Installation:** The agent MUST run the pip install command to guarantee all required packages in `requirements.txt` are installed before execution:
    ```powershell
-   python -m pip install -q -r "requirements.txt"
+    C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe -m pip install -q -r "requirements.txt"
    ```
 2. **Load base resume:** Load the candidate's base resume from the detected language folder:
    - `resume.md` (use `resume_de.md` for German JDs)
@@ -53,7 +53,7 @@ Populate each field of `improvement_blueprint` as follows:
 ### 5. Candidate Location Selection
 - Run the `closest_location.py` script on the created `Job_Description.yaml`:
   ```powershell
-  python "closest_location.py" "Job_Description.yaml"
+  C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "closest_location.py" "Job_Description.yaml"
   ```
 - Save the printed location (e.g. `Frankfurt, Germany`) under `closest_candidate_location` in the root of `ATS_Report.yaml`.
 
@@ -137,17 +137,17 @@ Run the Zvec search, closest location utility, and the compiler immediately afte
 cd "Applications\[Company Name] — [Job Role]\"
 
 # 1. Search and generate the tailored project list using Zvec (fully offline)
-python "zvec_portfolio_search.py" "Job_Description.yaml" "project_info.md"
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "zvec_portfolio_search.py" "Job_Description.yaml" "project_info.md"
 
 # 2. Run closest location script to determine the closest target location
-python "closest_location.py" "Job_Description.yaml"
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "closest_location.py" "Job_Description.yaml"
 # Note: Read the printed output and save it as closest_candidate_location in ATS_Report.yaml!
 
 # 3. Compile ATS Report
-python "yaml_to_pdf.py" "ATS_Report.yaml" "ATS_Report.pdf"
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.py" "ATS_Report.yaml" "ATS_Report.pdf"
 
 # 4. Compile Job Description
-python "yaml_to_pdf.py" "Job_Description.yaml" "Job_Description.pdf"
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.py" "Job_Description.yaml" "Job_Description.pdf"
 ```
 
 ---
