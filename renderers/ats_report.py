@@ -13,7 +13,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from .utils import TEXT_DARK, LINE_COLOR, escape_latex, run_pdflatex, register_google_sans_code
+from .utils import TEXT_DARK, LINE_COLOR, escape_latex, run_pdflatex, register_lm_roman_10
 
 
 # ── LaTeX renderer ────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ def _create_ats_report_pdf_reportlab(data, output_path):
     printable_width = A4[0] - 2 * margin
     styles = getSampleStyleSheet()
 
-    F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC = register_google_sans_code()
+    F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC = register_lm_roman_10()
 
     h1     = ParagraphStyle('ATSH1', parent=styles['Normal'], fontName=F_BOLD,
                             fontSize=20, leading=24, spaceAfter=4)

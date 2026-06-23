@@ -13,7 +13,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from .utils import TEXT_DARK, LINE_COLOR, escape_latex, run_pdflatex, register_google_sans_code
+from .utils import TEXT_DARK, LINE_COLOR, escape_latex, run_pdflatex, register_lm_roman_10
 
 
 # ── LaTeX renderer ────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ def _create_job_description_pdf_reportlab(data, output_path):
     printable_width = A4[0] - (2 * margin)
     styles = getSampleStyleSheet()
 
-    F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC = register_google_sans_code()
+    F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC = register_lm_roman_10()
 
     title_style = ParagraphStyle(
         'JDTitle', parent=styles['Normal'],

@@ -162,6 +162,14 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v14 — LM Roman 10 Font Integration
+**Files:** `renderers/utils.py`, `renderers/ats_report.py`, `renderers/job_description.py`, `README.md`
+
+- Replaced Google Sans Code font with Latin Modern Roman 10 (`LMRoman10`) for the ReportLab-based Job Description archival and ATS Report PDFs.
+- Added TTF registration code for `lmroman10` (regular, bold, italic, bold-italic) searching standard system and local AppData paths.
+
+---
+
 ### v13 — Job Location Tailoring
 **Files:** `SKILL.md`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `closest_location.py`, `README.md`
 
