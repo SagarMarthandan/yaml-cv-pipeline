@@ -147,10 +147,17 @@ def _find_and_register_font_family(
         else:
             # Default to local directories relative to project
             script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            local_appdata = os.environ.get("LOCALAPPDATA", "")
+            win_fonts = os.path.join(os.environ.get("WINDIR", "C:\\Windows"), "Fonts")
+            user_fonts = os.path.join(local_appdata, "Microsoft", "Windows", "Fonts") if local_appdata else ""
             dirs = [
                 os.path.join(script_dir, "fonts"),
                 os.path.join(script_dir, "..", "Base Files", "fonts"),
             ]
+            if win_fonts and os.path.exists(win_fonts):
+                dirs.append(win_fonts)
+            if user_fonts and os.path.exists(user_fonts):
+                dirs.append(user_fonts)
         
         regular_file, bold_file, italic_file, bold_italic_file = font_names
 
@@ -218,65 +225,6 @@ def register_google_sans_code() -> Tuple[str, str, str, str]:
     )
 
 
-_CALIBRI_REGISTERED = [None]
-
-def register_calibri() -> Tuple[str, str, str, str]:
-    """
-    Registers Calibri TTF fonts with ReportLab from the Windows system fonts directory.
-    Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) representing the registered font names,
-    or falls back to ('Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique', 'Helvetica-BoldOblique') if not found.
-    """
-    if _CALIBRI_REGISTERED[0] is not None:
-        return _CALIBRI_REGISTERED[0]
-
-    try:
-        from reportlab.pdfbase import pdfmetrics
-        from reportlab.pdfbase.ttfonts import TTFont
-
-        font_dirs = [
-            r"C:\Windows\Fonts",
-            os.path.join(os.path.expanduser("~"), "AppData", "Local", "Microsoft", "Windows", "Fonts"),
-        ]
-
-        regular = bold = italic = bold_italic = None
-        for d in font_dirs:
-            if not d or not os.path.isdir(d):
-                continue
-            r = os.path.join(d, "calibri.ttf")
-            b = os.path.join(d, "calibrib.ttf")
-            if os.path.exists(r) and os.path.exists(b):
-                regular     = r
-                bold        = b
-                italic      = os.path.join(d, "calibrii.ttf")
-                bold_italic = os.path.join(d, "calibriz.ttf")
-                break
-
-        if not regular or not bold:
-            fallback = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
-            _CALIBRI_REGISTERED[0] = fallback
-            return fallback
-
-        pdfmetrics.registerFont(TTFont("Calibri",        regular))
-        pdfmetrics.registerFont(TTFont("Calibri-Bold",   bold))
-        pdfmetrics.registerFont(TTFont("Calibri-Italic",     italic      if os.path.exists(italic)      else regular))
-        pdfmetrics.registerFont(TTFont("Calibri-BoldItalic", bold_italic if os.path.exists(bold_italic) else bold))
-        pdfmetrics.registerFontFamily(
-            "Calibri",
-            normal="Calibri",
-            bold="Calibri-Bold",
-            italic="Calibri-Italic",
-            boldItalic="Calibri-BoldItalic",
-        )
-        registered = ("Calibri", "Calibri-Bold", "Calibri-Italic", "Calibri-BoldItalic")
-        _CALIBRI_REGISTERED[0] = registered
-        return registered
-    except Exception as e:
-        print(f"Warning: Could not register Calibri: {e}", file=sys.stderr)
-        fallback = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
-        _CALIBRI_REGISTERED[0] = fallback
-        return fallback
-
-
 _LM_ROMAN_10_REGISTERED = [None]
 
 def register_lm_roman_10() -> Tuple[str, str, str, str]:
@@ -291,6 +239,38 @@ def register_lm_roman_10() -> Tuple[str, str, str, str]:
         font_names=("lmroman10-regular.ttf", "lmroman10-bold.ttf", "lmroman10-italic.ttf", "lmroman10-bolditalic.ttf"),
         fallback_names=("Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic"),
         cache_var=_LM_ROMAN_10_REGISTERED
+    )
+
+
+_CMU_CONCRETE_REGISTERED = [None]
+
+def register_cmu_concrete() -> Tuple[str, str, str, str]:
+    """
+    Registers CMU Concrete TTF fonts with ReportLab.
+    Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) or falls back to
+    ('Times-Roman', 'Times-Bold', 'Times-Italic', 'Times-BoldItalic') if not found.
+    """
+    return _find_and_register_font_family(
+        family_name="CMUConcrete",
+        font_names=("cmunorm.ttf", "cmunobx.ttf", "cmunoti.ttf", "cmunobi.ttf"),
+        fallback_names=("Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic"),
+        cache_var=_CMU_CONCRETE_REGISTERED
+    )
+
+
+_CALIBRI_REGISTERED = [None]
+
+def register_calibri() -> Tuple[str, str, str, str]:
+    """
+    Registers Calibri TTF fonts with ReportLab (standard Windows system font).
+    Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) or falls back to
+    ('Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique', 'Helvetica-BoldOblique') if not found.
+    """
+    return _find_and_register_font_family(
+        family_name="Calibri",
+        font_names=("calibri.ttf", "calibrib.ttf", "calibrii.ttf", "calibriz.ttf"),
+        fallback_names=("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique"),
+        cache_var=_CALIBRI_REGISTERED
     )
 
 

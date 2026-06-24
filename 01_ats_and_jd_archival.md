@@ -28,13 +28,13 @@ Do not proceed to scoring without first running the dependency installation and 
 - **Secondary archetype:** If the JD clearly spans two domains (e.g., requires both ML engineering and data platform work), assign a `secondary` archetype with its own one-sentence rationale. If the JD is focused on a single domain, omit the `secondary` field entirely.
 
 ### 2. German-Market ATS Scoring Matrix
-- Grade the current resume against a German-market calibrated matrix (0-100 total):
+- Grade the current resume against a German-market calibrated matrix (0-100 total) using **4 equally-weighted categories** (25 points each):
   - `keywords_and_terminology` (max 25)
   - `experience_relevance` (max 25)
-  - `technical_skills` (max 20)
-  - `formatting_and_parse` (max 15)
-  - `soft_skills_and_language` (max 15)
-- Save details and total score in `ats_score_matrix` in the YAML output.
+  - `technical_skills` (max 25)
+  - `soft_skills_and_language` (max 25)
+- **Formatting is NOT scored.** Instead, emit a separate non-scored `formatting_quality` verdict (see below) that classifies the resume's formatting/parsability as one of `Excellent`, `Good`, `Average`, or `Bad`. If the verdict is `Average` or `Bad`, populate `suggestions` with concrete fixes. This keeps formatting feedback visible without diluting the 100-point score.
+- Save category details and total score in `ats_score_matrix`, and the formatting verdict in `formatting_quality`, in the YAML output.
 - **Score Gate:** If `total_score < 85`, set `score_gate_verdict: HOLD` and stop the pipeline. Populate `remedy_suggestions` as a structured list (see schema). Warn the user to review remedies before proceeding to Step 2. If `>= 85`, set `score_gate_verdict: PROCEED`.
 
 ### 3. Improvement Blueprint Generation
@@ -76,10 +76,13 @@ role_archetype:
 ats_score_matrix:
   keywords_and_terminology: { max_score: 25, current_score: 0, evaluation_criteria: "..." }
   experience_relevance: { max_score: 25, current_score: 0, evaluation_criteria: "..." }
-  technical_skills: { max_score: 20, current_score: 0, evaluation_criteria: "..." }
-  formatting_and_parse: { max_score: 15, current_score: 0, evaluation_criteria: "..." }
-  soft_skills_and_language: { max_score: 15, current_score: 0, evaluation_criteria: "..." }
+  technical_skills: { max_score: 25, current_score: 0, evaluation_criteria: "..." }
+  soft_skills_and_language: { max_score: 25, current_score: 0, evaluation_criteria: "..." }
   total_score: 0
+formatting_quality:
+  verdict: "Excellent"   # one of: Excellent | Good | Average | Bad
+  notes: "[Optional one-line rationale]"
+  suggestions: []        # Populate ONLY when verdict is Average or Bad
 core_score_detractors: []
 improvement_blueprint:
   target_language_confirmation: "German/English"

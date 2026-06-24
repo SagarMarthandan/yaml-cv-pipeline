@@ -24,7 +24,7 @@ graph TD
 
     subgraph Step1 ["Step 1: ATS Analysis and JD Archival"]
         Deps[pip install -r requirements.txt]:::system
-        ATS["ATS Score Gate — 5-Category scoring matrix"]:::processing
+        ATS["ATS Score Gate — 4-Category scoring matrix"]:::processing
         Zvec["Zvec Local Search — all-MiniLM-L6-v2"]:::processing
     end
 
@@ -160,6 +160,17 @@ To execute the pipeline:
 ---
 
 ## 📋 Changelog
+
+### v19 — ATS Scoring Remodel & Calibri Font
+**Files:** `renderers/utils.py`, `renderers/ats_report.py`, `renderers/job_description.py`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `README.md`
+
+- **Removed `formatting_and_parse` from the ATS score matrix.** Formatting no longer dilutes the 100-point score.
+- **Rebalanced the matrix to 4 equally-weighted categories of 25 points each:** `keywords_and_terminology`, `experience_relevance`, `technical_skills`, `soft_skills_and_language` (total = 100).
+- **Added a non-scored `formatting_quality` verdict** (`Excellent` / `Good` / `Average` / `Bad`) with `suggestions` populated only when the verdict is `Average` or `Bad`. Rendered as a dedicated section in the ATS Report PDF (pre- and post-rewrite).
+- **Fixed unformatted dict rendering** in the ATS Report PDF: `bullet_point_density_audit` (`{bullet, issue}`) and `quantified_outcomes` (`{original, suggested}`) entries are now rendered as readable labeled lines instead of raw Python dict reprs.
+- **Switched the ATS Report and Job Description PDF typeface from CMU Concrete to Calibri** (standard Windows system font). Added `register_calibri()` in `renderers/utils.py` with Helvetica fallback.
+
+---
 
 ### v18 — Replace closest_location.py with LLM Web Search
 **Files:** `closest_location.py` (deleted), `tests/test_closest_location.py` (deleted), `config.py`, `01_ats_and_jd_archival.md`, `SKILL.md`, `README.md`

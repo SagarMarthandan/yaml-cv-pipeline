@@ -41,15 +41,15 @@ def _create_ats_report_pdf_reportlab(data, output_path):
     F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC = register_calibri()
 
     h1     = ParagraphStyle('ATSH1', parent=styles['Normal'], fontName=F_BOLD,
-                            fontSize=20, leading=22, spaceAfter=4)
+                            fontSize=20, leading=24, spaceAfter=4)
     h2     = ParagraphStyle('ATSH2', parent=styles['Normal'], fontName=F_BOLD,
-                            fontSize=10.5, leading=11.5)
+                            fontSize=10.5, leading=13)
     h3     = ParagraphStyle('ATSH3', parent=styles['Normal'], fontName=F_BOLD,
-                            fontSize=9.5, leading=10.5, spaceAfter=2)
+                            fontSize=9.5, leading=12, spaceAfter=2)
     body   = ParagraphStyle('ATSBody', parent=styles['Normal'], fontName=F_REG,
-                            fontSize=9, leading=10.5, textColor=TEXT_DARK)
+                            fontSize=9, leading=12.5, textColor=TEXT_DARK)
     bullet = ParagraphStyle('ATSBullet', parent=styles['Normal'], fontName=F_REG,
-                            fontSize=9, leading=10.5, leftIndent=12, firstLineIndent=-8,
+                            fontSize=9, leading=12.5, leftIndent=12, firstLineIndent=-8,
                             spaceAfter=2, textColor=TEXT_DARK)
 
     def section_header(title):
@@ -83,7 +83,6 @@ def _create_ats_report_pdf_reportlab(data, output_path):
         'keywords_and_terminology': 'Keywords & Terminology',
         'experience_relevance':      'Experience Relevance',
         'technical_skills':          'Technical Skills',
-        'formatting_and_parse':      'Formatting & Parse',
         'soft_skills_and_language':  'Soft Skills & Language',
     }
     table_data = [[Paragraph('<b>Category</b>', h3), Paragraph('<b>Score</b>', h3),
@@ -119,6 +118,34 @@ def _create_ats_report_pdf_reportlab(data, output_path):
     story.append(score_table)
     story.append(Spacer(1, 8))
 
+    # Formatting Quality (non-scored verdict)
+    fq = data.get('formatting_quality') or {}
+    fq_verdict = str(fq.get('verdict', '') or '').strip()
+    if fq_verdict:
+        story.append(section_header('Formatting Quality'))
+        story.append(Spacer(1, 4))
+        vlower = fq_verdict.lower()
+        if vlower == 'excellent':
+            vcolor = '#1a7a1a'
+        elif vlower == 'good':
+            vcolor = '#2a6a2a'
+        elif vlower == 'average':
+            vcolor = '#b35900'
+        else:  # bad or unknown
+            vcolor = '#a00000'
+        story.append(Paragraph(
+            f'<b>Verdict:</b> <font color="{vcolor}"><b>{fq_verdict.capitalize()}</b></font>', body
+        ))
+        fq_notes = fq.get('notes', '')
+        if fq_notes:
+            story.append(Paragraph(str(fq_notes), body))
+        fq_suggestions = fq.get('suggestions', []) or []
+        if fq_suggestions:
+            story.append(Paragraph('<b>Suggested Changes:</b>', body))
+            for s in fq_suggestions:
+                story.append(Paragraph(f'&bull;&nbsp;&nbsp;{s}', bullet))
+        story.append(Spacer(1, 6))
+
     # Core Score Detractors
     detractors = data.get('core_score_detractors', [])
     if detractors:
@@ -134,17 +161,42 @@ def _create_ats_report_pdf_reportlab(data, output_path):
         story.append(section_header('Improvement Blueprint'))
         story.append(Spacer(1, 4))
 
+        def _format_item(item):
+            """Render a blueprint item as readable text instead of a Python dict repr."""
+            if isinstance(item, dict):
+                return ' \u2014 '.join(f"{k}: {v}" for k, v in item.items())
+            return str(item)
+
         def sub(title, text=None, items=None):
             story.append(Paragraph(f'<b>{title}</b>', h3))
             if text:
                 story.append(Paragraph(str(text), body))
             if items:
                 for item in items:
-                    story.append(Paragraph(f'&bull;&nbsp;&nbsp;{item}', bullet))
+                    story.append(Paragraph(f'&bull;&nbsp;&nbsp;{_format_item(item)}', bullet))
             story.append(Spacer(1, 4))
 
         sub('Target Language', bp.get('target_language_confirmation', ''))
-        sub('Bullet Point Density Audit', items=bp.get('bullet_point_density_audit', []))
+
+        # Bullet Point Density Audit — items are {bullet, issue} dicts
+        density = bp.get('bullet_point_density_audit', []) or []
+        if density:
+            story.append(Paragraph('<b>Bullet Point Density Audit</b>', h3))
+            for d in density:
+                if isinstance(d, dict):
+                    b_text = str(d.get('bullet', ''))
+                    issue  = str(d.get('issue', ''))
+                    story.append(Paragraph(f'&bull;&nbsp;&nbsp;{b_text}', bullet))
+                    if issue:
+                        story.append(Paragraph(
+                            f'<i>&nbsp;&nbsp;&nbsp;&nbsp;Issue: {issue}</i>', bullet))
+                else:
+                    story.append(Paragraph(f'&bull;&nbsp;&nbsp;{d}', bullet))
+            story.append(Spacer(1, 4))
+        else:
+            story.append(Paragraph('<b>Bullet Point Density Audit</b>', h3))
+            story.append(Paragraph('All bullets contain quantified metrics.', body))
+            story.append(Spacer(1, 4))
 
         swap     = bp.get('project_swap_directive', {})
         rem_p    = swap.get('remove_projects', [])
@@ -185,7 +237,21 @@ def _create_ats_report_pdf_reportlab(data, output_path):
         if rems: story.append(Paragraph(f'<b>Remove:</b> {rems}', body))
         story.append(Spacer(1, 4))
 
-        sub('Quantified Outcomes', items=bp.get('quantified_outcomes', []))
+        # Quantified Outcomes — items are {original, suggested} dicts
+        outcomes = bp.get('quantified_outcomes', []) or []
+        if outcomes:
+            story.append(Paragraph('<b>Quantified Outcomes</b>', h3))
+            for o in outcomes:
+                if isinstance(o, dict):
+                    orig = str(o.get('original', ''))
+                    sug  = str(o.get('suggested', ''))
+                    story.append(Paragraph(f'&bull;&nbsp;&nbsp;<b>Original:</b> {orig}', bullet))
+                    if sug:
+                        story.append(Paragraph(
+                            f'&nbsp;&nbsp;&nbsp;&nbsp;<b>Suggested:</b> {sug}', bullet))
+                else:
+                    story.append(Paragraph(f'&bull;&nbsp;&nbsp;{o}', bullet))
+            story.append(Spacer(1, 4))
 
         cal       = bp.get('ats_threshold_calibration', {})
         meets     = cal.get('meets_target', False)
@@ -275,6 +341,28 @@ def _create_ats_report_pdf_reportlab(data, output_path):
             story.append(Paragraph('<b>Remaining Gaps</b>', h3))
             for g in post_gaps:
                 story.append(Paragraph(f'&bull;&nbsp;&nbsp;{g}', bullet))
+
+        # Post-Rewrite Formatting Quality (optional, non-scored)
+        post_fq = post.get('formatting_quality') or {}
+        post_fq_verdict = str(post_fq.get('verdict', '') or '').strip()
+        if post_fq_verdict:
+            story.append(Spacer(1, 4))
+            vlower = post_fq_verdict.lower()
+            if vlower == 'excellent':
+                vcolor = '#1a7a1a'
+            elif vlower == 'good':
+                vcolor = '#2a6a2a'
+            elif vlower == 'average':
+                vcolor = '#b35900'
+            else:
+                vcolor = '#a00000'
+            story.append(Paragraph(
+                f'<b>Post-Rewrite Formatting:</b> '
+                f'<font color="{vcolor}"><b>{post_fq_verdict.capitalize()}</b></font>', body
+            ))
+            post_fq_suggestions = post_fq.get('suggestions', []) or []
+            for s in post_fq_suggestions:
+                story.append(Paragraph(f'&bull;&nbsp;&nbsp;{s}', bullet))
 
     doc.build(story)
     print(f"Successfully compiled ATS Report via ReportLab: {output_path}")

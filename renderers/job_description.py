@@ -41,21 +41,21 @@ def _create_job_description_pdf_reportlab(data, output_path):
 
     title_style = ParagraphStyle(
         'JDTitle', parent=styles['Normal'],
-        fontName=F_BOLD, fontSize=15, leading=16,
+        fontName=F_BOLD, fontSize=15, leading=19,
         textColor=colors.black, spaceAfter=15,
     )
     section_style = ParagraphStyle(
         'JDSectionTitle', parent=styles['Normal'],
-        fontName=F_BOLD, fontSize=11, leading=12, textColor=colors.black,
+        fontName=F_BOLD, fontSize=11, leading=14, textColor=colors.black,
     )
     body_style = ParagraphStyle(
         'JDBody', parent=styles['Normal'],
-        fontName=F_REG, fontSize=9.5, leading=11.5,
+        fontName=F_REG, fontSize=9.5, leading=14,
         textColor=TEXT_DARK, spaceAfter=6,
     )
     bullet_style = ParagraphStyle(
         'JDBullet', parent=styles['Normal'],
-        fontName=F_REG, fontSize=9.5, leading=11.5,
+        fontName=F_REG, fontSize=9.5, leading=14,
         leftIndent=15, firstLineIndent=-10, spaceAfter=3, textColor=TEXT_DARK,
     )
 

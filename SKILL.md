@@ -68,6 +68,8 @@ Read and execute the full instructions in [01_ats_and_jd_archival.md](file:///c:
 
 Runs dependency check, parses and archives the job description, scores the base resume, performs location tailoring via web search to find the closest candidate city, and generates a tailored project list using the Zvec tool.
 
+**ATS Scoring Model:** 4 equally-weighted categories of 25 points each (total = 100) — Keywords & Terminology, Experience Relevance, Technical Skills, Soft Skills & Language. Formatting is **not scored**; instead a non-scored `formatting_quality` verdict (`Excellent` / `Good` / `Average` / `Bad`) is emitted with suggested changes when `Average` or `Bad`. Score gate: `PROCEED` if total >= 85, else `HOLD`.
+
 **Output:** `ATS_Report.yaml`, `ATS_Report.pdf`, `Job_Description.yaml`, `Job_Description.pdf`, and `project_info.md` in `[Company Name] — [Job Role]/` folder.
 
 ---
@@ -105,6 +107,7 @@ If the compilation fails:
 After all 3 steps complete, verify:
 - [ ] `ATS_Report.yaml` exists in the company folder with pre and post rewrite scores, including `closest_candidate_location`
 - [ ] `ATS_Report.pdf` is generated and `post_rewrite_ats_score` block is populated
+- [ ] `ATS_Report.yaml` contains a non-scored `formatting_quality` verdict (pre- and post-rewrite) with `suggestions` populated only if verdict is `Average` or `Bad`
 - [ ] `Job_Description.yaml` (with `location` key) & `Job_Description.pdf` are generated
 - [ ] `project_info.md` (tailored project list) is generated in the company folder
 - [ ] `Resume.yaml` & `SAGAR_MARTHANDAN_Resume.pdf` / `SAGAR_MARTHANDAN_Lebenslauf.pdf` are generated with the tailored closest location
