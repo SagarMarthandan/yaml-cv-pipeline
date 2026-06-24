@@ -39,7 +39,6 @@ End-to-end pipeline that takes a **Job Description (JD)** and produces a tailore
 - **Working Directory:** `Applications/` (relative to project root)
 - **Pipeline Script Structure:**
   - `yaml_to_pdf.py` — entry point; routes YAML files to the correct renderer
-  - `closest_location.py` — computes the closest candidate city (Kiel, Frankfurt, Berlin, Köln) based on job location
   - `renderers/utils.py` — shared utilities (`escape_latex`, color constants, `run_pdflatex`)
   - `renderers/resume.py` — Resume renderer (LaTeX primary, ReportLab fallback)
   - `renderers/cover_letter.py` — Cover Letter renderer (LaTeX primary, ReportLab fallback)
@@ -67,7 +66,7 @@ The user must provide:
 
 Read and execute the full instructions in [01_ats_and_jd_archival.md](file:///c:/Users/sagar/Documents/YAML-CV/skills/yaml-cv-pipeline/01_ats_and_jd_archival.md).
 
-Runs dependency check, parses and archives the job description, scores the base resume, performs location tailoring to find the closest candidate city, and generates a tailored project list using the Zvec tool.
+Runs dependency check, parses and archives the job description, scores the base resume, performs location tailoring via web search to find the closest candidate city, and generates a tailored project list using the Zvec tool.
 
 **Output:** `ATS_Report.yaml`, `ATS_Report.pdf`, `Job_Description.yaml`, `Job_Description.pdf`, and `project_info.md` in `[Company Name] — [Job Role]/` folder.
 

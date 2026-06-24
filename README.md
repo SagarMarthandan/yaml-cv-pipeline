@@ -80,7 +80,7 @@ The entire process is organized into 3 primary sequential steps, executed automa
 - **ATS Pre-Scoring:** Grades the base resume against a calibrated 5-category German-market matrix (max 100 points).
   - **Score Gate:** If the ATS score is `< 85`, the pipeline triggers a `HOLD` verdict, presenting specific remedy suggestions (e.g., missing keywords, project mismatches). If `>= 85`, it sets `PROCEED`.
 - **RAG-based Project Selector:** Queries a local **Zvec vector database** (populated offline from your master portfolio) to search and write the top 4 matching projects to a tailored `project_info.md` file — distilled to title + description + tools only (no code blocks, badges, or noise sections).
-- **Location Tailoring:** Extracts the job location from the job description and executes `closest_location.py` to automatically compute the closest candidate location among Kiel (home), Frankfurt (friend), Berlin (friend), and Köln (friend) based on great-circle distance.
+- **Location Tailoring:** Extracts the job location from the job description and uses web search to determine the closest candidate location among Kiel (home), Frankfurt (friend), Berlin (friend), and Köln (friend).
 - **Outputs:** `ATS_Report.yaml` & `Job_Description.yaml` (plus their compiled `.pdf` documents) and the tailored `project_info.md`.
 
 ### STEP 2: Resume Rewrite & Visual Layout Audit
@@ -134,7 +134,6 @@ YAML-CV/
 │       ├── 03_cover_letter.md            # Step 3 detailed agent rules
 │       ├── requirements.txt              # Pipeline dependencies
 │       ├── yaml_to_pdf.py                # Main YAML compilation router
-│       ├── closest_location.py           # Job location tailoring distance calculator
 │       ├── zvec_portfolio_search.py      # Zvec search, embedding & distillation engine
 │       └── renderers\                    # LaTeX/ReportLab rendering handlers
 └── Applications\
@@ -162,6 +161,17 @@ To execute the pipeline:
 
 ## 📋 Changelog
 
+### v18 — Replace closest_location.py with LLM Web Search
+**Files:** `closest_location.py` (deleted), `tests/test_closest_location.py` (deleted), `config.py`, `01_ats_and_jd_archival.md`, `SKILL.md`, `README.md`
+
+- Removed `closest_location.py` and its unit tests — the hardcoded city coordinate database and haversine distance calculation failed for remote locations and any city not in the static database.
+- Removed `CANDIDATES` and `CITY_COORDS` dictionaries from `config.py`.
+- Step 1 now instructs the LLM to **web search** which of the 4 candidate cities (Kiel, Frankfurt, Berlin, Köln) is geographically nearest to the job location.
+- Remote, country-wide, or unspecified locations still default to Kiel, Germany.
+- Updated `SKILL.md`, `01_ats_and_jd_archival.md`, and `README.md` to remove all `closest_location.py` references and reflect the web search approach.
+
+---
+
 ### v17 — Scope Leak Fixes & Portability Improvements
 **Files:** `config.py`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `renderers/utils.py`, `SKILL.md`, `README.md`
 
@@ -181,7 +191,7 @@ To execute the pipeline:
 ---
 
 ### v16 — Performance & Code Quality Optimizations
-**Files:** `zvec_portfolio_search.py`, `renderers/utils.py`, `renderers/cover_letter.py`, `closest_location.py`, `yaml_to_pdf.py`, `config.py`, `requirements.txt`, `test_closest_location.py`, `test_utils.py`
+**Files:** `zvec_portfolio_search.py`, `renderers/utils.py`, `renderers/cover_letter.py`, `yaml_to_pdf.py`, `config.py`, `requirements.txt`, `test_utils.py`
 
 **Performance Improvements:**
 - Implemented batch embedding in Zvec search (`model.encode()` with batch_size=32) - 3-5x faster portfolio ingestion
@@ -192,12 +202,10 @@ To execute the pipeline:
 - Created centralized `config.py` for all hardcoded paths, constants, and city coordinates with environment variable override support
 - Consolidated duplicate font registration code into `_find_and_register_font_family()` helper function (~60 lines reduced)
 - Extracted common address formatting utility `format_address()` for LaTeX/HTML rendering
-- Added comprehensive type hints to all functions in `zvec_portfolio_search.py`, `closest_location.py`, `renderers/utils.py`, and `yaml_to_pdf.py`
+- Added comprehensive type hints to all functions in `zvec_portfolio_search.py`, `renderers/utils.py`, and `yaml_to_pdf.py`
 
 **Testing:**
-- Created `test_closest_location.py` with 25 unit tests for haversine distance and location matching
 - Created `test_utils.py` with 30 unit tests for LaTeX escaping and address formatting utilities
-- All tests passing (55/55)
 
 ---
 
@@ -210,10 +218,10 @@ To execute the pipeline:
 ---
 
 ### v13 — Job Location Tailoring
-**Files:** `SKILL.md`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `closest_location.py`, `README.md`
+**Files:** `SKILL.md`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `03_cover_letter.md`, `README.md`
 
 - Introduced a location-tailoring mechanism that extracts the job location from the job description.
-- Created `closest_location.py` to map coordinates and compute the closest candidate city among Kiel (home), Frankfurt (friend), Berlin (friend), and Köln (friend).
+- Uses web search to determine the closest candidate city among Kiel (home), Frankfurt (friend), Berlin (friend), and Köln (friend).
 - Updated pipeline steps to propagate the closest candidate city to `Resume.yaml` and `Cover_Letter.yaml` addresses and dates.
 
 ---

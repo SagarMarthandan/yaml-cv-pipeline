@@ -51,11 +51,10 @@ Populate each field of `improvement_blueprint` as follows:
 - Structure into clean YAML sections (overview, requirements, responsibilities, stack) for permanent reference.
 
 ### 5. Candidate Location Selection
-- Run the `closest_location.py` script on the created `Job_Description.yaml`:
-  ```powershell
-  C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "closest_location.py" "Job_Description.yaml"
-  ```
-- Save the printed location (e.g. `Frankfurt, Germany`) under `closest_candidate_location` in the root of `ATS_Report.yaml`.
+- The candidate has 4 candidate cities: **Kiel** (home), **Frankfurt**, **Berlin**, and **Köln**.
+- Use **web search** to determine which of these 4 cities is geographically nearest to the job location extracted in Step 4.
+- For remote, country-wide, or unspecified locations, default to **Kiel, Germany**.
+- Save the result (e.g. `Frankfurt, Germany`) under `closest_candidate_location` in the root of `ATS_Report.yaml`.
 
 ## Output Target & Directory Structure
 Create folder `Applications/[Company Name] — [Job Role]/` and save three files:
@@ -68,7 +67,7 @@ Create folder `Applications/[Company Name] — [Job Role]/` and save three files
 type: ats_report
 company: "[Company Name]"      # Used by the PDF renderer for the report title
 position: "[Job Position Title]"  # Used by the PDF renderer for the report subtitle
-closest_candidate_location: "[Closest candidate location (Kiel, Frankfurt, Berlin, or Köln) determined by closest_location.py]"
+closest_candidate_location: "[Closest candidate location (Kiel, Frankfurt, Berlin, or Köln) determined via web search]"
 role_archetype:
   primary: "[Archetype Name]"
   secondary: "[Secondary Archetype — omit this field if JD is single-domain]"
@@ -132,21 +131,17 @@ sections:
 ```
 
 ## Compilation & Portfolio Search Commands
-Run the Zvec search, closest location utility, and the compiler immediately after writing the files to generate the assets:
+Run the Zvec search and the compiler immediately after writing the files to generate the assets:
 ```powershell
 cd "Applications\[Company Name] — [Job Role]\"
 
 # 1. Search and generate the tailored project list using Zvec (fully offline)
 C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "zvec_portfolio_search.py" "Job_Description.yaml" "project_info.md"
 
-# 2. Run closest location script to determine the closest target location
-C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "closest_location.py" "Job_Description.yaml"
-# Note: Read the printed output and save it as closest_candidate_location in ATS_Report.yaml!
-
-# 3. Compile ATS Report
+# 2. Compile ATS Report
 C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.py" "ATS_Report.yaml" "ATS_Report.pdf"
 
-# 4. Compile Job Description
+# 3. Compile Job Description
 C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.py" "Job_Description.yaml" "Job_Description.pdf"
 ```
 
