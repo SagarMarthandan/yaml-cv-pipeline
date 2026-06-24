@@ -13,7 +13,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
-from .utils import TEXT_DARK, LINE_COLOR, escape_latex, run_pdflatex, register_lm_roman_10
+from .utils import TEXT_DARK, LINE_COLOR, escape_latex, run_pdflatex, register_calibri
 
 
 # ── LaTeX renderer ────────────────────────────────────────────────────────────
@@ -38,18 +38,18 @@ def _create_ats_report_pdf_reportlab(data, output_path):
     printable_width = A4[0] - 2 * margin
     styles = getSampleStyleSheet()
 
-    F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC = register_lm_roman_10()
+    F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC = register_calibri()
 
     h1     = ParagraphStyle('ATSH1', parent=styles['Normal'], fontName=F_BOLD,
-                            fontSize=20, leading=24, spaceAfter=4)
+                            fontSize=20, leading=22, spaceAfter=4)
     h2     = ParagraphStyle('ATSH2', parent=styles['Normal'], fontName=F_BOLD,
-                            fontSize=10.5, leading=13)
+                            fontSize=10.5, leading=11.5)
     h3     = ParagraphStyle('ATSH3', parent=styles['Normal'], fontName=F_BOLD,
-                            fontSize=9.5, leading=12, spaceAfter=2)
+                            fontSize=9.5, leading=10.5, spaceAfter=2)
     body   = ParagraphStyle('ATSBody', parent=styles['Normal'], fontName=F_REG,
-                            fontSize=9, leading=12.5, textColor=TEXT_DARK)
+                            fontSize=9, leading=10.5, textColor=TEXT_DARK)
     bullet = ParagraphStyle('ATSBullet', parent=styles['Normal'], fontName=F_REG,
-                            fontSize=9, leading=12.5, leftIndent=12, firstLineIndent=-8,
+                            fontSize=9, leading=10.5, leftIndent=12, firstLineIndent=-8,
                             spaceAfter=2, textColor=TEXT_DARK)
 
     def section_header(title):

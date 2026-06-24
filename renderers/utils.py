@@ -218,6 +218,65 @@ def register_google_sans_code() -> Tuple[str, str, str, str]:
     )
 
 
+_CALIBRI_REGISTERED = [None]
+
+def register_calibri() -> Tuple[str, str, str, str]:
+    """
+    Registers Calibri TTF fonts with ReportLab from the Windows system fonts directory.
+    Returns (F_REG, F_BOLD, F_ITALIC, F_BOLDITALIC) representing the registered font names,
+    or falls back to ('Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique', 'Helvetica-BoldOblique') if not found.
+    """
+    if _CALIBRI_REGISTERED[0] is not None:
+        return _CALIBRI_REGISTERED[0]
+
+    try:
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+
+        font_dirs = [
+            r"C:\Windows\Fonts",
+            os.path.join(os.path.expanduser("~"), "AppData", "Local", "Microsoft", "Windows", "Fonts"),
+        ]
+
+        regular = bold = italic = bold_italic = None
+        for d in font_dirs:
+            if not d or not os.path.isdir(d):
+                continue
+            r = os.path.join(d, "calibri.ttf")
+            b = os.path.join(d, "calibrib.ttf")
+            if os.path.exists(r) and os.path.exists(b):
+                regular     = r
+                bold        = b
+                italic      = os.path.join(d, "calibrii.ttf")
+                bold_italic = os.path.join(d, "calibriz.ttf")
+                break
+
+        if not regular or not bold:
+            fallback = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
+            _CALIBRI_REGISTERED[0] = fallback
+            return fallback
+
+        pdfmetrics.registerFont(TTFont("Calibri",        regular))
+        pdfmetrics.registerFont(TTFont("Calibri-Bold",   bold))
+        pdfmetrics.registerFont(TTFont("Calibri-Italic",     italic      if os.path.exists(italic)      else regular))
+        pdfmetrics.registerFont(TTFont("Calibri-BoldItalic", bold_italic if os.path.exists(bold_italic) else bold))
+        pdfmetrics.registerFontFamily(
+            "Calibri",
+            normal="Calibri",
+            bold="Calibri-Bold",
+            italic="Calibri-Italic",
+            boldItalic="Calibri-BoldItalic",
+        )
+        registered = ("Calibri", "Calibri-Bold", "Calibri-Italic", "Calibri-BoldItalic")
+        _CALIBRI_REGISTERED[0] = registered
+        return registered
+    except Exception as e:
+        print(f"Warning: Could not register Calibri: {e}", file=sys.stderr)
+        fallback = ("Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique")
+        _CALIBRI_REGISTERED[0] = fallback
+        return fallback
+
+
 _LM_ROMAN_10_REGISTERED = [None]
 
 def register_lm_roman_10() -> Tuple[str, str, str, str]:
