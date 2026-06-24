@@ -38,12 +38,17 @@ graph TD
         CL["Geschaeftsbr. Generation — Cover_Letter.yaml"]:::processing
     end
 
+    subgraph Step4 ["Post-Pipeline: Folder Sort"]
+        Sort["organize_applications.py — YYYY/MM/DD tree"]:::processing
+    end
+
     %% Pipeline Outputs
     OutJD["Job_Description.yaml / .pdf"]:::output
     OutATS["ATS_Report.yaml / .pdf"]:::output
     OutProj["project_info.md — Tailored Project List"]:::output
     OutRes["Resume.yaml / SAGAR_MARTHANDAN_Resume.pdf"]:::output
     OutCL["Cover_Letter.yaml / SAGAR_MARTHANDAN_Cover_Letter.pdf"]:::output
+    OutTree["Applications/YYYY/MM/DD/[Company] — [Role]/"]:::output
 
     %% Flow Connections
     JD --> Deps
@@ -66,13 +71,16 @@ graph TD
     OutProj --> CL
     OutRes --> CL
     CL --> OutCL
+
+    OutCL --> Sort
+    Sort --> OutTree
 ```
 
 ---
 
 ## 🛠️ Step-by-Step Execution Guide
 
-The entire process is organized into 3 primary sequential steps, executed automatically by the agent when you supply a Job Description:
+The entire process is organized into 3 primary sequential steps, executed automatically by the agent when you supply a Job Description, followed by an automatic post-pipeline folder sort:
 
 ### STEP 1: Setup, ATS Analysis & Job Description Archival
 - **Dependency Ingest:** Automatically installs/updates pip dependencies (`zvec`, `sentence-transformers`, `pyyaml`, `reportlab`, `pypdf`) using Python 3.12.
@@ -100,6 +108,11 @@ The entire process is organized into 3 primary sequential steps, executed automa
 - **Geschäftsbrief Layout:** Generates a metric-grounded cover letter adapted to formal German business formatting, set to the computed closest candidate location (both in the sender address and date/city header).
 - **Strict Limits:** Restricts cover letter content to exactly one page, 4 paragraphs, and **250–320 words** total (restricted to **180–240 words** for German cover letters to prevent A4 overflow).
 - **Outputs:** `Cover_Letter.yaml` and compiled `SAGAR_MARTHANDAN_Cover_Letter.pdf` / `SAGAR_MARTHANDAN_Anschreiben.pdf` (along with preserved LaTeX `.tex` sources).
+
+### Post-Pipeline: Application Folder Sorting
+- **Date-Organized Tree:** After Step 3, [organize_applications.py](organize_applications.py) moves the just-created application folder into `Applications/YYYY/MM/DD/[Company Name] — [Job Role]/`, bucketed by the folder's creation time.
+- **Idempotent:** Re-running the script is a no-op on already-sorted folders.
+- **Standalone Use:** Run `python organize_applications.py` to sort all existing unsorted folders in `Applications/`, or `python organize_applications.py "Applications/[Company] — [Role]"` to sort a single folder. Use `--dry-run` to preview moves without applying them.
 
 ---
 
@@ -135,15 +148,19 @@ YAML-CV/
 │       ├── requirements.txt              # Pipeline dependencies
 │       ├── yaml_to_pdf.py                # Main YAML compilation router
 │       ├── zvec_portfolio_search.py      # Zvec search, embedding & distillation engine
+│       ├── organize_applications.py      # Sorts application folders into YYYY/MM/DD tree (post-pipeline)
 │       └── renderers\                    # LaTeX/ReportLab rendering handlers
 └── Applications\
-    └── [Company Name] — [Job Role]\      # Automatically created output folder
-        ├── Job_Description.yaml / .pdf
-        ├── ATS_Report.yaml / .pdf
-        ├── project_info.md               # Tailored & distilled project list (2-3 lines/project)
-        ├── Resume.yaml / Layout_Audit_Report.yaml / Cover_Letter.yaml
-        ├── SAGAR_MARTHANDAN_Resume.pdf / .tex  (or Lebenslauf.pdf / .tex for German)
-        └── SAGAR_MARTHANDAN_Cover_Letter.pdf / .tex  (or Anschreiben.pdf / .tex for German)
+    └── YYYY\
+        └── MM\
+            └── DD\
+                └── [Company Name] — [Job Role]\      # Application folder (sorted by creation date)
+                    ├── Job_Description.yaml / .pdf
+                    ├── ATS_Report.yaml / .pdf
+                    ├── project_info.md               # Tailored & distilled project list (2-3 lines/project)
+                    ├── Resume.yaml / Layout_Audit_Report.yaml / Cover_Letter.yaml
+                    ├── SAGAR_MARTHANDAN_Resume.pdf / .tex  (or Lebenslauf.pdf / .tex for German)
+                    └── SAGAR_MARTHANDAN_Cover_Letter.pdf / .tex  (or Anschreiben.pdf / .tex for German)
 ```
 
 ---
@@ -155,11 +172,23 @@ Since all the pipeline steps are natively codified into the agent's custom skill
 To execute the pipeline:
 1. Paste the target **Job Description** (JD) into the chat.
 2. Type: **`execute yaml-cv-pipeline`** (or keywords like *"tailor resume"* / *"optimize resume"*).
-3. The agent will automatically run the end-to-end flow: installing dependencies, searching matching projects using Zvec, compiling the ATS reports, and writing the final tailored files to the `Applications/` directory.
+3. The agent will automatically run the end-to-end flow: installing dependencies, searching matching projects using Zvec, compiling the ATS reports, writing the final tailored files to the `Applications/` directory, and sorting the application folder into the `Applications/YYYY/MM/DD/` date tree.
 
 ---
 
 ## 📋 Changelog
+
+### v20 — Application Folder Date-Tree Sorting
+**Files:** `organize_applications.py` (new), `03_cover_letter.md`, `SKILL.md`, `README.md`
+
+- **Added `organize_applications.py`** — sorts application folders into a `Applications/YYYY/MM/DD/[Company Name] — [Job Role]/` tree, bucketed by each folder's creation time (`os.path.getctime`).
+- **Two run modes:** scan mode (sorts every unsorted folder in `Applications/`) and targeted mode (sorts a single freshly-created folder, used by the pipeline).
+- **Pipeline integration:** Step 3 now runs the sorter automatically after the cover letter compiles, placing the new application folder into the correct date bucket.
+- **Idempotent and safe:** already-sorted folders are skipped; `--dry-run` previews moves; `--root` overrides the Applications path for isolated testing; UTF-8 stdout reconfigure handles em-dash (`—`) folder names on the Windows console.
+- **Updated `SKILL.md`** pipeline overview diagram, script listing, and completion checklist.
+- **Updated `README.md`** mermaid workflow diagram, step-by-step guide, directory structure, and how-to-run section.
+
+---
 
 ### v19 — ATS Scoring Remodel & Calibri Font
 **Files:** `renderers/utils.py`, `renderers/ats_report.py`, `renderers/job_description.py`, `01_ats_and_jd_archival.md`, `02_resume_and_visual_audit.md`, `README.md`

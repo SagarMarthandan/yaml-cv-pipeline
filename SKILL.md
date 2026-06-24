@@ -26,6 +26,10 @@ End-to-end pipeline that takes a **Job Description (JD)** and produces a tailore
          ▼
   Step 3: Cover Letter ───────────► Reads tailored project_info.md
                                      └───► Generates: Cover_Letter.yaml/pdf/tex
+         │
+         ▼
+  Post-Pipeline: Sort ───────────► Moves the application folder into
+                                     Applications/YYYY/MM/DD/[Company] — [Role]/
 ```
 
 ## Prerequisites
@@ -44,6 +48,7 @@ End-to-end pipeline that takes a **Job Description (JD)** and produces a tailore
   - `renderers/cover_letter.py` — Cover Letter renderer (LaTeX primary, ReportLab fallback)
   - `renderers/job_description.py` — Job Description renderer (ReportLab only)
   - `renderers/ats_report.py` — ATS Report renderer (ReportLab only)
+  - `organize_applications.py` — Sorts application folders into a Year/Month/Date tree (run after Step 3)
 
 ## General Writing & Style Rules (Stop-Slop)
 
@@ -119,4 +124,5 @@ After all 3 steps complete, verify:
 - [ ] Summary section is exactly 4 lines and <= 420 characters (<= 380 characters for German Zusammenfassung)
 - [ ] Cover letter fits on exactly one page and has 250–320 words (180–240 words for German Anschreiben)
 - [ ] All files match the target JD language and comply with the Stop-Slop guidelines
+- [ ] `organize_applications.py` has moved the application folder into `Applications/YYYY/MM/DD/[Company Name] — [Job Role]/` (run after Step 3)
 

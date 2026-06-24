@@ -69,6 +69,14 @@ C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.p
 C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "yaml_to_pdf.py" "Cover_Letter.yaml" "SAGAR_MARTHANDAN_Anschreiben.pdf"
 ```
 
+## Post-Pipeline: Sort Application Folder into Year/Month/Date Tree
+After all three pipeline steps complete and every output file is verified, move the application folder into the date-organized tree (`Applications/YYYY/MM/DD/[Company Name] — [Job Role]/`). The date bucket is derived from the folder's creation time. Run the sorter targeting the just-created folder:
+```powershell
+cd "[skill directory]"
+C:\Users\sagar\AppData\Local\Programs\Python\Python312\python.exe "organize_applications.py" "Applications/[Company Name] — [Job Role]"
+```
+The script is idempotent: re-running it on an already-sorted folder is a no-op. If the folder name contains characters that the shell mangles, quote the path exactly as written by the pipeline.
+
 ---
 ### ATTACHMENTS FOR PROCESSING
 - Load `Job_Description.yaml` from the company folder (output of Step 1) — do not re-paste the raw JD.
